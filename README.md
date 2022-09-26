@@ -1,1 +1,1 @@
-# project_work
+# Project for strategy agency to save big data
