@@ -20,7 +20,6 @@ class Product_view(APIView):
         products = Product.objects.none()
         details = Detail.objects.none()
         countries = Country.objects.filter(pk__in=request.data.get('country_id')) #.select_related('country_id')
-        request.session['countries'] = countries
         for country in countries:
             details |= Detail.objects.filter(country=country).values('product_id')
         for datail in details:
@@ -31,15 +30,13 @@ class Product_view(APIView):
 
 class Product_view_test(APIView):
     def get(self, request):  
-        # try:
+        try:
             countries = request.session.get('countries')
             products = Product.objects.filter(pk__in=request.data.get('product_id'))
-            # httpresponse = Product_view.get(request)
-            # print(httpresponse.data)
             serializer = Product_serializer_details(products, many=True, context={'request': request, "country_id": countries})
             return Response(serializer.data)
-        # except TypeError:
-        #     raise SuspiciousOperation('Invalid JSON')
+        except (TypeError, KeyError):
+            raise SuspiciousOperation('Invalid JSON')
 
 
 # sql_query = pd.read_sql("""select a.code_product, a.product_name, a.skp, b.price, b.duty, b.year, c.country_name 

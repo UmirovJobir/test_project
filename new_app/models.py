@@ -13,17 +13,13 @@ class Product(models.Model):
     code_product = models.BigIntegerField()
     product_name = models.TextField()
     skp = models.CharField(max_length=50)
-    # country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='test')
 
-    # def current_epg(self):
-    #     return Detail.objects.filter(product=self)
 
     def __str__(self):
         return self.product_name
     
     class Meta:
         verbose_name_plural = 'Products'
-        # unique_together = ('code_product', 'country',)
 
 
 class Detail(models.Model):
