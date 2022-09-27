@@ -1,15 +1,17 @@
-from yaml import serialize
 from .models import Product, Detail, Country
 from .serializers import Detail_serializer, Product_serializer, Country_serializer, Product_serializer_details
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core.exceptions import SuspiciousOperation
-import pandas as pd
+from django.http import JsonResponse
+import json
+from database import DB
+data = DB()
 
-
+from new_app.libs.psql import db_clint
 
 class Country_view(APIView):
-    def get(self):
+    def get(self, request):
         countries = Country.objects.all()
         serializer = Country_serializer(countries, many=True)
         return Response(serializer.data)
@@ -17,30 +19,33 @@ class Country_view(APIView):
 
 class Product_view(APIView):
     def get(self, request):
-        products = Product.objects.none()
         details = Detail.objects.none()
-        countries = Country.objects.filter(pk__in=request.data.get('country_id')) #.select_related('country_id')
-        for country in countries:
-            details |= Detail.objects.filter(country=country).values('product_id')
-        for datail in details:
-            products |= Product.objects.filter(pk=datail['product_id'])
+        countries = Country.objects.filter(pk__in=request.data.get('country_id'))
+        products = Product.objects.filter(details__country__in=countries).distinct()
         serializer = Product_serializer(products, many=True)
         return Response(serializer.data)
 
 
 class Product_view_test(APIView):
     def get(self, request):  
-        try:
-            countries = request.session.get('countries')
+        # try:
+            countries = request.data['country_id']
+            print(countries)
             products = Product.objects.filter(pk__in=request.data.get('product_id'))
             serializer = Product_serializer_details(products, many=True, context={'request': request, "country_id": countries})
             return Response(serializer.data)
-        except (TypeError, KeyError):
-            raise SuspiciousOperation('Invalid JSON')
+        # except (TypeError, KeyError):
+        #     raise SuspiciousOperation('Invalid JSON')
 
 
-# sql_query = pd.read_sql("""select a.code_product, a.product_name, a.skp, b.price, b.duty, b.year, c.country_name 
-                                        # from new_app_product a, new_app_detail b, new_app_country c 
-                                        # where a.id=b.product_id and c.id=b.country_id;""", conn)
-                                    
-                                     # data for Doston skp_list, country_list, sql_query
+class Database(APIView):
+    def get(self, requestn):
+        # db = data.select_db()
+        # print(db)
+        # db_json = db.to_json(orient='records')
+        # return JsonResponse(json.loads(db_json), safe = False)
+        db_clint.read_sql()
+        return Response(data={"status": "success"})
+
+# data for Doston skp_list, country_list, sql_query
+
