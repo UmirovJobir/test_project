@@ -5,8 +5,6 @@ from rest_framework.response import Response
 from django.core.exceptions import SuspiciousOperation
 from django.http import JsonResponse
 import json
-from database import DB
-data = DB()
 
 from new_app.libs.psql import db_clint
 
