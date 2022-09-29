@@ -28,14 +28,14 @@ class Product_view(APIView):
 
 class Product_view_test(APIView):
     def get(self, request):  
-        # try:
+        try:
             countries = request.data['country_id']
             print(countries)
             products = Product.objects.filter(pk__in=request.data.get('product_id'))
             serializer = Product_serializer_details(products, many=True, context={'request': request, "country_id": countries})
             return Response(serializer.data)
-        # except (TypeError, KeyError):
-        #     raise SuspiciousOperation('Invalid JSON')
+        except (TypeError, KeyError):
+            raise SuspiciousOperation('Invalid JSON')
 
 
 class Database(APIView):
@@ -44,7 +44,8 @@ class Database(APIView):
         # print(db)
         # db_json = db.to_json(orient='records')
         # return JsonResponse(json.loads(db_json), safe = False)
-        db_clint.read_sql()
+        a = db_clint.read_sql()
+        print(a)
         return Response(data={"status": "success"})
 
 # data for Doston skp_list, country_list, sql_query

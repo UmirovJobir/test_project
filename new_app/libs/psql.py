@@ -20,7 +20,7 @@ class Database:
         sql = pd.read_sql("""select a.code_product, a.product_name, a.skp, b.price, b.duty, y.year_number, c.country_name
                     from new_app_product a, new_app_detail b, new_app_country c, new_app_year y 
                     where a.id=b.product_id and c.id=b.country_id and y.id=b.year_id;""", self.conn)
-        print(sql)
+        return sql
 
 
 db_clint: Database = Database(
