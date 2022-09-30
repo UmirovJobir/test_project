@@ -91,16 +91,16 @@ WSGI_APPLICATION = 'strategy_agency.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'test', 
-        'USER': 'postgres', 
-        'PASSWORD': '123',
-        'HOST': '127.0.0.1', 
-        'PORT': '5432',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'test', 
+#         'USER': 'postgres', 
+#         'PASSWORD': '123',
+#         'HOST': '127.0.0.1', 
+#         'PORT': '5432',
+#     }
+# }
 
 # PGDATABASE='railway'
 # PGHOST='containers-us-west-81.railway.app'
@@ -123,16 +123,16 @@ DATABASES = {
 
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'strategy_agency', 
-#         'USER': 'postgres', 
-#         'PASSWORD': '123',
-#         'HOST': '127.0.0.1', 
-#         'PORT': '5432',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'strategy_agency', 
+        'USER': 'postgres', 
+        'PASSWORD': '123',
+        'HOST': '127.0.0.1', 
+        'PORT': '5432',
+    }
+}
 
 
 # Password validation
