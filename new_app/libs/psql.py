@@ -24,7 +24,7 @@ class Database:
 
 
 db_clint: Database = Database(
-    database="test",
+    database="strategy_agency",
     user="postgres",
     password="123",
     host="127.0.0.1",
