@@ -17,7 +17,6 @@ class Country_view(APIView):
 
 class Product_view(APIView):
     def get(self, request):
-        details = Detail.objects.none()
         countries = Country.objects.filter(pk__in=request.data.get('country_id'))
         products = Product.objects.filter(details__country__in=countries).distinct()
         serializer = Product_serializer(products, many=True)
@@ -38,13 +37,13 @@ class Product_view_test(APIView):
 
 class Database(APIView):
     def get(self, requestn):
-        # db = data.select_db()
-        # print(db)
-        # db_json = db.to_json(orient='records')
-        # return JsonResponse(json.loads(db_json), safe = False)
         a = db_clint.read_sql()
-        print(a)
+        print(type(a))
         return Response(data={"status": "success"})
 
+
+
 # data for Doston skp_list, country_list, sql_query
+# db_json = db.to_json(orient='records')
+        # return JsonResponse(json.loads(db_json), safe = False)
 
