@@ -36,7 +36,12 @@ class Product_view_test(APIView):
 
 
 class Database(APIView):
-    def get(self, requestn):
+    def get(self, request):
+        # countries = request.data['country_id']
+        # products = request.data['product_id']
+        # country_ = 
+        # for country in countries:
+            
         a = db_clint.read_sql()
         print(type(a))
         return Response(data={"status": "success"})
