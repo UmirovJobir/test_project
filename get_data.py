@@ -14,7 +14,7 @@ class my_dictionary(dict):
 dict_obj = my_dictionary()
 
 def db():
-    df = pd.read_excel("test.xlsx") #countries_data_for_db.xlsx
+    df = pd.read_excel("countries_data_for_db.xlsx") #
     df = df.fillna('-')
     # columns = df.columns
     for i in df.values:
