@@ -79,7 +79,7 @@ def elasticity_calculating(duty:DataFrame,imp:DataFrame,skp:list): #calculating 
         row += 1
     return elast
 
-def adding_new_duties_to_df(data:DataFrame,products:list,duties:list): # lists from Djobir
+def adding_new_duties_to_df(data:DataFrame,products:list,duties:list): #developing (lists from Djobir)
     return
 
 def adding_new_import(years:ndarray,skp:list,elasticity:ndarray,alpha:float,duty:DataFrame,imp:DataFrame): #import forecast for the new year
