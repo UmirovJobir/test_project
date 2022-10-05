@@ -1,11 +1,12 @@
 import re
+from tkinter.font import names
 
 from pytz import country_names
 from new_app.libs.psql import db_clint
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
-from numpy import ndarray
+from numpy import ndarray, product
 from pandas import DataFrame
 
 #FIRST MODUL
@@ -79,8 +80,17 @@ def elasticity_calculating(duty:DataFrame,imp:DataFrame,skp:list): #calculating 
         row += 1
     return elast
 
-def adding_new_duties_to_df(data:DataFrame,products:list,duties:list): #developing (lists from Djobir)
-    return
+def adding_new_duties_to_df(data:DataFrame,products:list,duties:list,years:ndarray): #adding new duties from user to DF (lists from Djobir)
+    new_duties = data[data['year_number'] == years[len(years)-2]]
+    new_duties.set_index('name',drop=False,inplace=True)
+    j = 0
+    for i in products:
+        new_duties.loc[i,'duty'] = duties[j]
+        j += 1
+    new_duties.reset_index(drop=True,inplace=False)
+    new_duties.loc[:,'year_number'] = years[len(years)-1]
+    data = pd.concat([data,new_duties])
+    return data
 
 def adding_new_import(years:ndarray,skp:list,elasticity:ndarray,alpha:float,duty:DataFrame,imp:DataFrame): #import forecast for the new year
     j = 0
@@ -96,3 +106,5 @@ def adding_new_import(years:ndarray,skp:list,elasticity:ndarray,alpha:float,duty
 if __name__ == '__main__':
     country_id = ['Армения','Беларусь','Казахстан','Кыргызстан','Российская Федерация']
     skp = ['C13','C14','C15','C21','C29','C30']
+    duties = [5,12,25]
+    products = ['МЕХ ИСКУССТВЕННЫЙ И ИЗДЕЛИЯ ИЗ НЕГО','ШЕЛК-СЫРЕЦ (НЕКРУЧЕНЫЙ)','ПРЯЖА ИЗ ШЕРСТИ ИЛИ ТОНКОГО ВОЛОСА ЖИВОТНЫХ, РАСФАСОВАННАЯ ДЛЯ РОЗНИЧНОЙ ПРОДАЖИ:С СОДЕРЖАНИЕМ ШЕРСТИ ИЛИ ТОНКОГО ВОЛОСА ЖИВОТНЫХ 85 МАС.% ИЛИ БОЛЕЕ:ПРОЧАЯ']
