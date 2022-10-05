@@ -1,5 +1,4 @@
 import re
-from tkinter.font import names
 
 from pytz import country_names
 from new_app.libs.psql import db_clint
