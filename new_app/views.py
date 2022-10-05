@@ -43,6 +43,7 @@ class Product_view_test(APIView):
 
 class Database(APIView):
     def get(self, request):
+        print(request.data)
         country_id = request.data['country_id']
         product_id = request.data['product_id']
         duties = request.data['duty']
@@ -73,7 +74,7 @@ class Database(APIView):
         elasticity = elasticity_calculating(duty, imp, skp)
         a = adding_new_duties_to_df(data,products, duties, years)
         
-        # print(a)
+        print(a)
         return Response(data={"status": "success"})
 
 
