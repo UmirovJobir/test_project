@@ -5,7 +5,12 @@ from rest_framework.response import Response
 from django.core.exceptions import SuspiciousOperation
 from django.http import JsonResponse
 import json
-from logic import elast_modul, data_reading, year, creating_duties, elasticity_calculating
+from logic import (
+    elast_modul, 
+    data_reading, year, creating_duties, creating_import, elasticity_calculating,
+    adding_new_duties_to_df,
+)
+
 
 from new_app.libs.psql import db_clint
 
@@ -40,6 +45,7 @@ class Database(APIView):
     def get(self, request):
         country_id = request.data['country_id']
         product_id = request.data['product_id']
+        duties = request.data['duty']
 
         countries = []
         products = []
@@ -52,14 +58,22 @@ class Database(APIView):
         for product in product_id:
             name = Product.objects.filter(id=product).values()
             for i in name:
-                skp.append(i.get('skp'))
-                products.append(i.get('product_name'))
-                
+                if i.get('skp') in skp:
+                    products.append(i.get('product_name'))
+                else:
+                    skp.append(i.get('skp'))
+                    products.append(i.get('product_name'))
+        
+
         data = data_reading(countries, skp)
         years = year(data)
-        b = creating_duties(years, data, skp)
-        a = elasticity_calculating(years, data, skp)
-        print(a)
+        print(years)
+        duty = creating_duties(years, data, skp)
+        imp = creating_import(years, data, skp)
+        elasticity = elasticity_calculating(duty, imp, skp)
+        a = adding_new_duties_to_df(data,products, duties, years)
+        
+        # print(a)
         return Response(data={"status": "success"})
 
 

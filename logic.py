@@ -84,7 +84,7 @@ def elasticity_calculating(duty:DataFrame,imp:DataFrame,skp:list): #calculating 
 
 def adding_new_duties_to_df(data:DataFrame,products:list,duties:list,years:ndarray): #adding new duties from user to DF (lists from Djobir)
     new_duties = data[data['year_number'] == years[len(years)-2]]
-    new_duties.set_index('name',drop=False,inplace=True)
+    new_duties.set_index('product_name',drop=False,inplace=True)
     j = 0
     for i in products:
         new_duties.loc[i,'duty'] = duties[j]
