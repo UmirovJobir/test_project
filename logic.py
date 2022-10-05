@@ -1,6 +1,4 @@
-import re
 
-from pytz import country_names
 from new_app.libs.psql import db_clint
 import numpy as np
 import pandas as pd
@@ -8,6 +6,11 @@ from sklearn.linear_model import LinearRegression
 from numpy import ndarray, product
 from pandas import DataFrame
 
+
+
+
+def elast_modul(countries:list,skp:list):
+    pass
 #FIRST MODUL
 
 def data_reading(countries:list,skp:list): #returning filtered DataFrame with all skp and country product groups entered by the user (lists from Djobir)
@@ -102,8 +105,12 @@ def adding_new_import(years:ndarray,skp:list,elasticity:ndarray,alpha:float,duty
     return imp
 
 
+
 if __name__ == '__main__':
     country_id = ['Армения','Беларусь','Казахстан','Кыргызстан','Российская Федерация']
     skp = ['C13','C14','C15','C21','C29','C30']
+<<<<<<< HEAD
     duties = [5,12,25]
     products = ['МЕХ ИСКУССТВЕННЫЙ И ИЗДЕЛИЯ ИЗ НЕГО','ШЕЛК-СЫРЕЦ (НЕКРУЧЕНЫЙ)','ПРЯЖА ИЗ ШЕРСТИ ИЛИ ТОНКОГО ВОЛОСА ЖИВОТНЫХ, РАСФАСОВАННАЯ ДЛЯ РОЗНИЧНОЙ ПРОДАЖИ:С СОДЕРЖАНИЕМ ШЕРСТИ ИЛИ ТОНКОГО ВОЛОСА ЖИВОТНЫХ 85 МАС.% ИЛИ БОЛЕЕ:ПРОЧАЯ']
+=======
+>>>>>>> f2ea07397519ca41b41b3f378627ccdcb27d642e

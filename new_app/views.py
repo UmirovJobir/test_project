@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from django.core.exceptions import SuspiciousOperation
 from django.http import JsonResponse
 import json
+from logic import elast_modul, data_reading, year, creating_duties, elasticity_calculating
 
 from new_app.libs.psql import db_clint
 
@@ -36,9 +37,29 @@ class Product_view_test(APIView):
 
 
 class Database(APIView):
-    def get(self, requestn):
-        a = db_clint.read_sql()
-        print(type(a))
+    def get(self, request):
+        country_id = request.data['country_id']
+        product_id = request.data['product_id']
+
+        countries = []
+        products = []
+        skp = []
+
+        for country in country_id:
+            name = Country.objects.filter(id=country).values()
+            for i in name:
+                countries.append(i.get('country_name'))
+        for product in product_id:
+            name = Product.objects.filter(id=product).values()
+            for i in name:
+                skp.append(i.get('skp'))
+                products.append(i.get('product_name'))
+                
+        data = data_reading(countries, skp)
+        years = year(data)
+        b = creating_duties(years, data, skp)
+        a = elasticity_calculating(years, data, skp)
+        print(a)
         return Response(data={"status": "success"})
 
 
