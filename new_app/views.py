@@ -74,7 +74,7 @@ class Database(APIView):
         elasticity = elasticity_calculating(duty, imp, skp)
         a = adding_new_duties_to_df(data,products, duties, years)
         
-        # print(a)
+        print(a)
         return Response(data={"status": "success"})
 
 
