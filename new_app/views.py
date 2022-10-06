@@ -43,6 +43,7 @@ class Product_view_test(APIView):
 
 class Database(APIView):
     def get(self, request):
+        print(request.data)
         country_id = request.data['country_id']
         product_id = request.data['product_id']
         duties = request.data['duty']
