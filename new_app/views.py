@@ -40,41 +40,50 @@ class Product_view_test(APIView):
         except (TypeError, KeyError):
             raise SuspiciousOperation('Invalid JSON')
 
+from get_data import my_dictionary
+dict_obj = my_dictionary()
 
 class Database(APIView):
     def get(self, request):
-        print(request.data)
+        # print(request.data)
         country_id = request.data['country_id']
+        # print(country_id)
         product_id = request.data['product_id']
-        duties = request.data['duty']
-
-        countries = []
-        products = []
-        skp = []
-
-        for country in country_id:
-            name = Country.objects.filter(id=country).values()
-            for i in name:
-                countries.append(i.get('country_name'))
         for product in product_id:
-            name = Product.objects.filter(id=product).values()
-            for i in name:
-                if i.get('skp') in skp:
-                    products.append(i.get('product_name'))
-                else:
-                    skp.append(i.get('skp'))
-                    products.append(i.get('product_name'))
+            # print(product['id'],product['duty'])
+            dict_obj.add(product['id'],product['duty'])
+        print(dict_obj)
+            # print()
+        # print(product_id[0]['id'])
+        # duties = request.data['duty']
+
+        # countries = []
+        # products = []
+        # skp = []
+
+        # for country in country_id:
+        #     name = Country.objects.filter(id=country).values()
+        #     for i in name:
+        #         countries.append(i.get('country_name'))
+        # for product in product_id:
+        #     name = Product.objects.filter(id=product).values()
+        #     for i in name:
+        #         if i.get('skp') in skp:
+        #             products.append(i.get('product_name'))
+        #         else:
+        #             skp.append(i.get('skp'))
+        #             products.append(i.get('product_name'))
         
 
-        data = data_reading(countries, skp)
-        years = year(data)
-        print(years)
-        duty = creating_duties(years, data, skp)
-        imp = creating_import(years, data, skp)
-        elasticity = elasticity_calculating(duty, imp, skp)
-        a = adding_new_duties_to_df(data,products, duties, years)
+        # data = data_reading(countries, skp)
+        # years = year(data)
+        # print(years)
+        # duty = creating_duties(years, data, skp)
+        # imp = creating_import(years, data, skp)
+        # elasticity = elasticity_calculating(duty, imp, skp)
+        # a = adding_new_duties_to_df(data,products, duties, years)
         
-        print(a)
+        # print(a)
         return Response(data={"status": "success"})
 
 
