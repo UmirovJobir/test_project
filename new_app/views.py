@@ -6,10 +6,10 @@ from django.core.exceptions import SuspiciousOperation
 from django.http import JsonResponse
 import json
 from logic import (
-    elast_modul, 
-    data_reading, year, creating_duties, creating_import, elasticity_calculating,
-    adding_new_duties_to_df,
+    first_modul_main
 )
+from get_data import my_dictionary
+dict_obj = my_dictionary()
 
 
 from new_app.libs.psql import db_clint
@@ -40,51 +40,42 @@ class Product_view_test(APIView):
         except (TypeError, KeyError):
             raise SuspiciousOperation('Invalid JSON')
 
-from get_data import my_dictionary
-dict_obj = my_dictionary()
 
 class Database(APIView):
     def get(self, request):
         # print(request.data)
         country_id = request.data['country_id']
-        # print(country_id)
         product_id = request.data['product_id']
+        duties = request.data['duty']
+        year = request.data['year']
+        percent = request.data['percent']
+
+
+        countries = []
+        products = []
+        skp = []
+        percent = percent/100
+
+        for country in country_id:
+            name = Country.objects.filter(id=country).values()
+            for i in name:
+                countries.append(i.get('country_name'))
         for product in product_id:
-            # print(product['id'],product['duty'])
-            dict_obj.add(product['id'],product['duty'])
-        print(dict_obj)
-            # print()
-        # print(product_id[0]['id'])
-        # duties = request.data['duty']
-
-        # countries = []
-        # products = []
-        # skp = []
-
-        # for country in country_id:
-        #     name = Country.objects.filter(id=country).values()
-        #     for i in name:
-        #         countries.append(i.get('country_name'))
-        # for product in product_id:
-        #     name = Product.objects.filter(id=product).values()
-        #     for i in name:
-        #         if i.get('skp') in skp:
-        #             products.append(i.get('product_name'))
-        #         else:
-        #             skp.append(i.get('skp'))
-        #             products.append(i.get('product_name'))
+            name = Product.objects.filter(id=product).values()
+            for i in name:
+                if i.get('skp') in skp:
+                    products.append(i.get('product_name'))
+                else:
+                    skp.append(i.get('skp'))
+                    products.append(i.get('product_name'))
         
+        print(countries, products, skp, duties, year, percent)
 
-        # data = data_reading(countries, skp)
-        # years = year(data)
-        # print(years)
-        # duty = creating_duties(years, data, skp)
-        # imp = creating_import(years, data, skp)
-        # elasticity = elasticity_calculating(duty, imp, skp)
-        # a = adding_new_duties_to_df(data,products, duties, years)
+        res = first_modul_main(countries,skp,products,duties,year,percent)
+        print(res)
+        return Response(res)
         
-        # print(a)
-        return Response(data={"status": "success"})
+        # return Response(data={"status": "success"})
 
 
 
