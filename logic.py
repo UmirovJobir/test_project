@@ -7,8 +7,6 @@ from numpy import ndarray, product
 from pandas import DataFrame
 
 
-
-
 def elast_modul(countries:list,skp:list):
     pass
 #FIRST MODUL

@@ -6,10 +6,12 @@ from django.core.exceptions import SuspiciousOperation
 from django.http import JsonResponse
 import json
 from logic import (
-    first_modul_main
+    first_modul_main,
+    year
 )
-from get_data import my_dictionary
-dict_obj = my_dictionary()
+from .dict_make import dictionary_maker
+year_duty = dictionary_maker()
+product_with_year_duty = dictionary_maker()
 
 
 from new_app.libs.psql import db_clint
@@ -41,15 +43,13 @@ class Product_view_test(APIView):
             raise SuspiciousOperation('Invalid JSON')
 
 
-class Database(APIView):
+class Data_1_modul(APIView):
     def get(self, request):
-        # print(request.data)
         country_id = request.data['country_id']
         product_id = request.data['product_id']
         duties = request.data['duty']
         year = request.data['year']
         percent = request.data['percent']
-
 
         countries = []
         products = []
@@ -75,8 +75,43 @@ class Database(APIView):
         print(res)
         return Response(res)
         
-        # return Response(data={"status": "success"})
+        
+class Data_2_model(APIView):
+    def get(self, request):
+        country_id = request.data['country_id']
+        product_id = request.data['product_id']
+        years = request.data['years']
 
+        # percent = request.data['percent']
+        
+        countries = []
+        products = []
+        skp = []
+
+        for country in country_id:
+            name = Country.objects.filter(id=country).values()
+            for i in name:
+                countries.append(i.get('country_name'))
+
+        for product_data in product_id:
+            name = Product.objects.filter(id=product_data['id']).values()
+            for i in name:
+                if i.get('skp') in skp:
+                    products.append(i.get('product_name'))
+                else:
+                    skp.append(i.get('skp'))
+                    products.append(i.get('product_name'))
+
+        for product in products:
+            value = (product_data['duty'])
+            product_with_year_duty.add(product,value)
+
+        print(countries)
+        print(skp)
+        print(years)
+        print(product_with_year_duty)
+       
+        return Response(data={"status": "success"})
 
 
 # data for Doston skp_list, country_list, sql_query
