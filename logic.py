@@ -25,7 +25,7 @@ def year(data:DataFrame): #func to know in which year we now
     return data['year_number'].unique()
 
 def creating_duties(years:ndarray,data:DataFrame,skp:list): #creating skp groups duties
-    columns = ['skp','value','year']
+    columns = ['skp','value','year_number']
     duty = pd.DataFrame(columns=columns)
     for i in years:
         for j in skp:
@@ -34,7 +34,7 @@ def creating_duties(years:ndarray,data:DataFrame,skp:list): #creating skp groups
     return duty
 
 def creating_import(years:ndarray,data:DataFrame,skp:list): #creating skp groups import
-    columns = ['skp','value','year']
+    columns = ['skp','value','year_number']
     imp = pd.DataFrame(columns=columns)
     for i in years:
         for j in skp:
@@ -97,9 +97,9 @@ def adding_new_duties_to_df(data:DataFrame,products:list,duties:list,years:ndarr
 def adding_new_import(years:ndarray,skp:list,elasticity:ndarray,alpha:float,duty:DataFrame,imp:DataFrame): #import forecast for the new year
     j = 0
     for i in skp:
-        new_duty = duty.loc[(duty['skp'] == i) & (duty['year'] == years[-1])]
-        old_duty = duty.loc[(duty['skp'] == i) & (duty['year'] == years[-2])]
-        old_import = imp.loc[(imp['skp'] == i) & (imp['year'] == years[-2])]
+        new_duty = duty.loc[(duty['skp'] == i) & (duty['year_number'] == years[-1])]
+        old_duty = duty.loc[(duty['skp'] == i) & (duty['year_number'] == years[-2])]
+        old_import = imp.loc[(imp['skp'] == i) & (imp['year_number'] == years[-2])]
         new_duty = new_duty['value'].values
         old_duty = old_duty['value'].values
         old_import = old_import['value'].values
@@ -123,6 +123,21 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
         elasticity = elasticity_calculating(duty,imp,skp)
     return imp
 
+#SECOND MODUL
+
+def dollars_to_million_sums(imp:DataFrame,exchange_rate:float):
+    imp.loc[:,'value'] *= exchange_rate
+    imp.loc[:,'value'] /= 1000
+    return imp
+
+def matrix_reading():
+    pass
+
+def all_import_export_reading():
+    pass
+
+def all_used_resources_final_demand_reading():
+    pass
 
 if __name__ == '__main__':
     country_id = ['Армения','Беларусь','Казахстан','Кыргызстан','Российская Федерация']
