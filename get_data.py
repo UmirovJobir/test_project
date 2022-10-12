@@ -5,18 +5,10 @@ django.setup()
 from new_app.models import Product, Detail, Country, Year
 import pandas as pd
 
-class my_dictionary(dict):
-   def __init__(self):
-    self = dict()
-
-   def add(self, key, value):
-    self[key] = value
-dict_obj = my_dictionary()
 
 def db():
-    df = pd.read_excel("countries_data_for_db.xlsx") #
+    df = pd.read_excel("countries_data_for_db.xlsx")
     df = df.fillna('-')
-    # columns = df.columns
     for i in df.values:
         try:
             c = Country.objects.get(country_name=i[6])
@@ -29,9 +21,9 @@ def db():
             y = Year.objects.create(year_number=i[3])
 
         try:
-            p = Product.objects.get(code_product=i[0], product_name=i[1], skp=i[2]) #, country=c)
+            p = Product.objects.get(code_product=i[0], product_name=i[1], skp=i[2])
         except Product.DoesNotExist:
-            p = Product.objects.create(code_product=i[0], product_name=i[1], skp=i[2]) #, country=c)
+            p = Product.objects.create(code_product=i[0], product_name=i[1], skp=i[2])
         
         if (i[4]=='-' and i[5]=='-'):
                 Detail.objects.create(year=y, product=p, country=c)
