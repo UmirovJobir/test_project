@@ -31,7 +31,7 @@ class Product_view(APIView):
         return Response(serializer.data)
 
 
-class Product_view_test(APIView):
+class Detail(APIView):
     def get(self, request):  
         try:
             countries = request.data['country_id']
