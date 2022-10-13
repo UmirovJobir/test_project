@@ -35,8 +35,6 @@ class Detail(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='details')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='countries')
 
-    def __str__(self):
-        return f"{self.product} {self.year}"
     class Meta:
         verbose_name_plural = 'Details'
 

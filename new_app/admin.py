@@ -2,14 +2,18 @@ from django.contrib import admin
 from import_export.admin import ImportExportActionModelAdmin
 
 from django.contrib import admin
-from .models import Product, Detail, Country, Import_export_for_db, X_and_C_for_db, Matrix
-
+from .models import (
+    Product, 
+    Detail, 
+    Country, 
+    Import_export_for_db, 
+    X_and_C_for_db, 
+    Matrix
+)
 
 @admin.register(Import_export_for_db, X_and_C_for_db, Matrix)
 class Admin(ImportExportActionModelAdmin):
     pass
-
-
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
@@ -18,8 +22,8 @@ class CountryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    list_display = ('code_product','product_name', 'skp')
     search_fields = ('product_name',)
 
-@admin.register(Detail)
-class DetailAdmin(admin.ModelAdmin):
-    pass
+
+    
