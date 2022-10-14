@@ -21,6 +21,8 @@ class Database:
                     from new_app_product a, new_app_detail b, new_app_country c, new_app_year y 
                     where a.id=b.product_id and c.id=b.country_id and y.id=b.year_id;""", self.conn)
         return sql
+    
+    # def 
 
 
 db_clint: Database = Database(
