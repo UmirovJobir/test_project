@@ -10,7 +10,7 @@ from logic import (
     year
 )
 from .dict_make import dictionary_maker
-year_duty = dictionary_maker()
+# year_duty = dictionary_maker()
 product_with_year_duty = dictionary_maker()
 
 
@@ -45,6 +45,7 @@ class Detail(APIView):
 
 class Data_1_modul(APIView):
     def get(self, request):
+        print(request.data)
         country_id = request.data['country_id']
         product_id = request.data['product_id']
         duties = request.data['duty']
@@ -74,9 +75,12 @@ class Data_1_modul(APIView):
         res = first_modul_main(countries,skp,products,duties,year,percent)
         print(res)
         return Response(res)
+
+        # return Response(data={"status": "success"})
         
         
-class Data_2_model(APIView):
+        
+class Data_2_modul(APIView):  # duty in object request form"
     def get(self, request):
         country_id = request.data['country_id']
         product_id = request.data['product_id']
