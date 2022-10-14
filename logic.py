@@ -129,13 +129,13 @@ def dollars_to_million_sums(imp:DataFrame,exchange_rate:float):
     return imp
 
 def matrix_reading():
-    pass
+    db_clint.matrix()
 
 def all_import_export_reading():
-    pass
+     db_clint.import_export_for_db()
 
 def all_used_resources_final_demand_reading():
-    pass
+     db_clint.x_and_c_for_db()
 
 if __name__ == '__main__':
     country_id = ['Армения','Беларусь','Казахстан','Кыргызстан','Российская Федерация']
