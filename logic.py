@@ -106,7 +106,12 @@ def adding_new_import(years:ndarray,skp:list,elasticity:ndarray,alpha:float,duty
         j += 1
     return imp
 
-def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year:int,alpha:float): #we need alpha and end year of prediction
+def dollars_to_million_sums(imp:DataFrame,exchange_rate:float):
+    imp.loc[:,'value'] *= exchange_rate
+    imp.loc[:,'value'] /= 1000
+    return imp
+
+def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year:int,alpha:float,exchange_rate:float): #we need alpha and end year of prediction
     data = data_reading(countries,skp)
     years = year(data)
     duty = creating_duties(years,data,skp)
@@ -119,23 +124,43 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
         duty = creating_duties(years,data,skp)
         imp = adding_new_import(years,skp,elasticity,alpha,duty,imp)
         elasticity = elasticity_calculating(duty,imp,skp)
+    imp = dollars_to_million_sums(imp,exchange_rate)
     return imp
 
 #SECOND MODUL
 
-def dollars_to_million_sums(imp:DataFrame,exchange_rate:float):
-    imp.loc[:,'value'] *= exchange_rate
-    imp.loc[:,'value'] /= 1000
-    return imp
+def creating_all_import(all_import_export:DataFrame):
+    all_import = all_import_export.drop(columns=['export'],axis=1)
+    return all_import
 
-def matrix_reading():
-    db_clint.matrix()
+def creating_all_export(all_import_export:DataFrame):
+    all_export = all_import_export.drop(columns=['_import'],axis=1)
+    return all_export
 
-def all_import_export_reading():
-     db_clint.import_export_for_db()
+def creating_all_used_resources(all_used_resources_final_demand:DataFrame):
+    all_used_resources = all_used_resources_final_demand.drop(columns=['final_demand'],axis=1)
+    return all_used_resources
 
-def all_used_resources_final_demand_reading():
-     db_clint.x_and_c_for_db()
+def creating_all_final_demand(all_used_resources_final_demand:DataFrame):
+    all_final_demand = all_used_resources_final_demand.drop(columns=['all_used_resources'],axis=1)
+    return all_final_demand
+
+def import_forecast(all_imp:DataFrame,imp:DataFrame,user_year:int):
+    pass
+
+def second_modul_main(first_module_result:DataFrame):
+    technological_matrix = db_clint.matrix()
+    all_import_export = db_clint.import_export_for_db()
+    all_used_resources_final_demand = db_clint.x_and_c_for_db()
+
+    used_resources = creating_all_used_resources(all_used_resources_final_demand)
+    final_demand = creating_all_final_demand(all_used_resources_final_demand)
+    all_imp = creating_all_import(all_import_export)
+    all_exp = creating_all_export(all_import_export)
+    
+    
+
+
 
 if __name__ == '__main__':
     country_id = ['Армения','Беларусь','Казахстан','Кыргызстан','Российская Федерация']
@@ -147,5 +172,6 @@ if __name__ == '__main__':
     'КИСЛОТЫ КАРБОНОВЫЕ, СОДЕРЖАЩИЕ ФЕНОЛЬНУЮ ГРУППУ, НО НЕ СОДЕРЖАЩИЕ ДРУГУЮ КИСЛОРОДСОДЕРЖАЩУЮ ФУНКЦИОНАЛЬНУЮ ГРУППУ, ИХ АНГИДРИДЫ, ГАЛОГЕНАНГИДРИДЫ, ПЕРОКСИДЫ, ПЕРОКСИКИСЛОТЫ И ИХ ПРОИЗВОДНЫЕ: САЛИЦИЛОВАЯ КИСЛОТА И ЕЕ СОЛИ',
     'ПРОЧИЕ ИЗДЕЛИЯ ИЗ СВИНЦА:ПРОЧИЕ',
     'ЖЕЛЕЗНОДОРОЖНЫЕ ЛОКОМОТИВЫ, С ПИТАНИЕМ ОТ ВНЕШНЕГО ИСТОЧНИКА ЭЛЕКТРОЭНЕРГИИ, ИЛИ АККУМУЛЯТОРНЫЕ: С ПИТАНИЕМ ОТ ЭЛЕКТРИЧЕСКИХ АККУМУЛЯТОРОВ']
-    res = first_modul_main(country_id,skp,products,duties,2035,0.05)
+    res = first_modul_main(country_id,skp,products,duties,2035,0.05,11000.0)
+    res_2 = second_modul_main(res)
     print(res)
