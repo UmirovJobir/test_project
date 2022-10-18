@@ -5,24 +5,21 @@ from rest_framework.response import Response
 from django.core.exceptions import SuspiciousOperation
 from django.http import JsonResponse
 import json
+from new_app.libs.psql import db_clint
 from logic import (
     first_modul_main,
-    year
+    year,
+    
 )
-from .dict_make import dictionary_maker
-# year_duty = dictionary_maker()
-product_with_year_duty = dictionary_maker()
 
-
-from new_app.libs.psql import db_clint
-
-class Country_view(APIView):
+# All countries
+class Country_view(APIView):  
     def get(self, request):
         countries = Country.objects.all()
         serializer = Country_serializer(countries, many=True)
         return Response(serializer.data)
 
-
+# Filtered products by countries with user choosed
 class Product_view(APIView):
     def get(self, request):
         countries = Country.objects.filter(pk__in=request.data.get('country_id'))
@@ -30,7 +27,7 @@ class Product_view(APIView):
         serializer = Product_serializer(products, many=True)
         return Response(serializer.data)
 
-
+# Data of products with user choosed by counties which he/she wants to see
 class Detail(APIView):
     def get(self, request):  
         try:
@@ -43,7 +40,9 @@ class Detail(APIView):
             raise SuspiciousOperation('Invalid JSON')
 
 
-class Data_1_modul(APIView):
+# Logical part of project.
+# API gets request (country_id, product_id, duties, year, percent, exchange_rate, percent) and response a future data of skp
+class Data(APIView):
     def get(self, request):
         print(request.data)
         country_id = request.data['country_id']
@@ -51,6 +50,7 @@ class Data_1_modul(APIView):
         duties = request.data['duty']
         year = request.data['year']
         percent = request.data['percent']
+        exchange_rate = request.data['exchange_rate']
 
         countries = []
         products = []
@@ -72,50 +72,11 @@ class Data_1_modul(APIView):
         
         print(countries, products, skp, duties, year, percent)
 
-        res = first_modul_main(countries,skp,products,duties,year,percent)
+        res = first_modul_main(countries,skp,products,duties,year,percent, exchange_rate)
         print(res)
         return Response(res)
 
-        # return Response(data={"status": "success"})
-        
-        
-        
-class Data_2_modul(APIView):  # duty in object request form"
-    def get(self, request):
-        country_id = request.data['country_id']
-        product_id = request.data['product_id']
-        years = request.data['years']
-
-        # percent = request.data['percent']
-        
-        countries = []
-        products = []
-        skp = []
-
-        for country in country_id:
-            name = Country.objects.filter(id=country).values()
-            for i in name:
-                countries.append(i.get('country_name'))
-
-        for product_data in product_id:
-            name = Product.objects.filter(id=product_data['id']).values()
-            for i in name:
-                if i.get('skp') in skp:
-                    products.append(i.get('product_name'))
-                else:
-                    skp.append(i.get('skp'))
-                    products.append(i.get('product_name'))
-
-        for product in products:
-            value = (product_data['duty'])
-            product_with_year_duty.add(product,value)
-
-        print(countries)
-        print(skp)
-        print(years)
-        print(product_with_year_duty)
-       
-        return Response(data={"status": "success"})
+        # return Response(data={"res": res, "res_2":res})
 
 
 # data for Doston skp_list, country_list, sql_query

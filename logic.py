@@ -158,8 +158,6 @@ def second_modul_main(first_module_result:DataFrame):
     all_imp = creating_all_import(all_import_export)
     all_exp = creating_all_export(all_import_export)
     
-    
-
 
 
 if __name__ == '__main__':
