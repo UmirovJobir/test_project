@@ -3,12 +3,9 @@ from new_app.libs.psql import db_clint
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
-from numpy import ndarray, product
+from numpy import inner, ndarray, product
 from pandas import DataFrame
 
-
-def elast_modul(countries:list,skp:list):
-    pass
 #FIRST MODUL
 
 def data_reading(countries:list,skp:list): #returning filtered DataFrame with all skp and country product groups entered by the user (lists from Djobir)
@@ -119,11 +116,13 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
     elasticity = elasticity_calculating(duty,imp,skp)
     starting_point = years[-1]
     for i in range(starting_point,user_year):
+        j = 0
         years = np.append(years,i+1)
-        data = adding_new_duties_to_df(data,products,duties,years)
+        data = adding_new_duties_to_df(data,products,duties[j],years)
         duty = creating_duties(years,data,skp)
         imp = adding_new_import(years,skp,elasticity,alpha,duty,imp)
         elasticity = elasticity_calculating(duty,imp,skp)
+        j += 1
     imp = dollars_to_million_sums(imp,exchange_rate)
     return imp
 
@@ -131,33 +130,133 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
 
 def creating_all_import(all_import_export:DataFrame):
     all_import = all_import_export.drop(columns=['export'],axis=1)
+    all_import.rename(columns={'year': 'year_number'},inplace=True)
     return all_import
 
 def creating_all_export(all_import_export:DataFrame):
     all_export = all_import_export.drop(columns=['_import'],axis=1)
+    all_export.rename(columns={'year': 'year_number'},inplace=True)
     return all_export
 
 def creating_all_used_resources(all_used_resources_final_demand:DataFrame):
     all_used_resources = all_used_resources_final_demand.drop(columns=['final_demand'],axis=1)
+    all_used_resources.rename(columns={'year': 'year_number'},inplace=True)
     return all_used_resources
 
 def creating_all_final_demand(all_used_resources_final_demand:DataFrame):
     all_final_demand = all_used_resources_final_demand.drop(columns=['all_used_resources'],axis=1)
+    all_final_demand.rename(columns={'year': 'year_number'},inplace=True)
     return all_final_demand
 
-def import_forecast(all_imp:DataFrame,imp:DataFrame,user_year:int):
-    pass
+def other_import(all_imp:DataFrame,imp:DataFrame,skp:list,years:ndarray):
+    import_frame = imp.loc[imp['year_number'] == years[-1]]
+    all_imp_frame = all_imp.loc[all_imp['year_number'] == years[-1]]
+    all_imp = all_imp.loc[all_imp['year_number'] != years[-1]]
+    all_imp_frame.set_index('skp',drop=False,inplace=True)
+    import_frame.set_index('skp',drop=False,inplace=True)
+    for i in skp:
+        all_imp_frame.loc[i,'_import'] -= import_frame.loc[i,'value']
+    all_imp_frame.reset_index(drop=True,inplace=True)
+    all_imp = pd.concat([all_imp,all_imp_frame])
+    return all_imp
 
-def second_modul_main(first_module_result:DataFrame):
+def import_forecast(other_imp:DataFrame,years:ndarray,alpha:float):
+    skp = other_imp['skp'].unique()
+    new_imp = other_imp[other_imp['year_number'] == years[-2]]
+    new_imp.set_index('skp',drop=False,inplace=True)
+    for i in skp:
+        if ((i.find('F') != -1 or i.find('H') != -1 or i.find('G') != -1 or i.find('B') != -1 or i.find('L') != -1 or i.find('O') != -1 or i.find('P') != -1) and years[-1] >= 2030):
+            new_imp.loc[i,'_import'] *= (1 + alpha)
+        elif ((i.find('Q') != -1 or i.find('D') != -1 or i.find('J') != -1 or i.find('K') != -1 or i.find('S') != -1 or i.find('I') != -1 or i.find('N') != -1 or i.find('M') != -1 or i.find('R') != -1 or i.find('E') != -1) and years[-1] >= 2025):
+            new_imp.loc[i,'_import'] *= (1 + alpha)
+    new_imp.reset_index(drop=True,inplace=True)
+    new_imp.loc[:,'year_number'] = years[-1]
+    other_imp = pd.concat([other_imp,new_imp])
+    return other_imp
+
+def export_forecast(all_exp:DataFrame,years:ndarray,alpha_exp:float):
+    skp = all_exp['skp'].unique()
+    new_exp = all_exp[all_exp['year_number'] == years[-2]]
+    new_exp.set_index('skp',drop=False,inplace=True)
+    for i in skp:
+        if ((i.find('F') != -1 or i.find('H') != -1 or i.find('G') != -1 or i.find('B') != -1 or i.find('L') != -1 or i.find('O') != -1 or i.find('P') != -1) and years[-1] >= 2030):
+            new_exp.loc[i,'export'] *= (1 + alpha_exp)
+        elif ((i.find('Q') != -1 or i.find('D') != -1 or i.find('J') != -1 or i.find('K') != -1 or i.find('S') != -1 or i.find('I') != -1 or i.find('N') != -1 or i.find('M') != -1 or i.find('R') != -1 or i.find('E') != -1) and years[-1] >= 2025):
+            new_exp.loc[i,'export'] *= (1 + alpha_exp)
+    new_exp.reset_index(drop=True,inplace=True)
+    new_exp.loc[:,'year_number'] = years[-1]
+    all_exp = pd.concat([all_exp,new_exp])
+    return all_exp    
+
+def final_import_forecast(other_imp:DataFrame,imp:DataFrame,starting_year:int,skp:list):
+    all_imp = other_imp.loc[other_imp['year_number'] < starting_year + 1]
+    import_frame = imp.loc[imp['year_number'] >= starting_year + 1]
+    all_imp_frame = other_imp.loc[other_imp['year_number'] >= starting_year + 1]
+    all_imp_frame.set_index('skp',drop=False,inplace=True)
+    import_frame.set_index('skp',drop=False,inplace=True)
+    for i in skp:
+        all_imp_frame.loc[i,'_import'] += import_frame.loc[i,'value']
+    all_imp_frame.reset_index(drop=True,inplace=True)
+    all_imp = pd.concat([all_imp,all_imp_frame])
+    return all_imp
+
+def final_demand_forecast(final_demand:DataFrame,all_imp:DataFrame,years:ndarray):
+    skp = final_demand['skp'].unique()
+    new_final_demand = final_demand[final_demand['year_number'] == years[-2]]
+    old_import = all_imp[all_imp['year_number'] == years[-2]]
+    new_final_demand.set_index('skp',drop=False,inplace=True)
+    old_import.set_index('skp',drop=False,inplace=True)
+    old_final_demand = new_final_demand
+    for i in skp:
+        new_final_demand.loc[i,'final_demand'] = old_final_demand.loc[i,'final_demand'] + 0.2 * old_import.loc[i,'_import']
+    new_final_demand.reset_index(drop=True,inplace=True)
+    new_final_demand.loc[:,'year_number'] = years[-1]
+    final_demand = pd.concat([final_demand,new_final_demand])
+    return final_demand
+
+def create_inverse_matrix(technological_matrix:DataFrame):
+    identity_matrix = np.eye(78)
+    technological_matrix.drop(columns=['id'],axis=1,inplace=True)
+    technological_matrix = technological_matrix.astype(np.float64).to_numpy()
+    technological_matrix = np.subtract(identity_matrix,technological_matrix)
+    inverse_matrix = np.linalg.inv(technological_matrix)
+    return inverse_matrix
+
+def used_resources_forecast(used_resources:DataFrame,final_demand:DataFrame,inverse_matrix:ndarray,years:ndarray):
+    new_used_resources = used_resources[used_resources['year_number'] == years[-2]]
+    final_demand_frame = final_demand[final_demand['year_number'] == years[-1]]
+    c = final_demand_frame['final_demand'].values
+    x = np.dot(inverse_matrix,c)
+    return used_resources
+
+def second_modul_main(first_module_result:DataFrame,user_year:int,skp:list,alpha:float,alpha_exp:float):
     technological_matrix = db_clint.matrix()
+    inverse_matrix = create_inverse_matrix(technological_matrix)
     all_import_export = db_clint.import_export_for_db()
     all_used_resources_final_demand = db_clint.x_and_c_for_db()
+    years_imp_exp = all_import_export['year'].unique()
+    years_ur_fd = all_used_resources_final_demand['year'].unique()
 
     used_resources = creating_all_used_resources(all_used_resources_final_demand)
     final_demand = creating_all_final_demand(all_used_resources_final_demand)
     all_imp = creating_all_import(all_import_export)
     all_exp = creating_all_export(all_import_export)
+
+    other_imp = other_import(all_imp,first_module_result,skp,years_imp_exp)
+    starting_point = years_imp_exp[-1]
+    for i in range(starting_point,user_year):
+        years_imp_exp = np.append(years_imp_exp,i+1)
+        other_imp = import_forecast(other_imp,years_imp_exp,alpha)
+        all_exp = export_forecast(all_exp,years_imp_exp,alpha_exp)
+    all_imp = final_import_forecast(other_imp,first_module_result,starting_point,skp)
     
+    starting_point_1 = years_ur_fd[-1]
+    for i in range(starting_point_1,user_year):
+        years_ur_fd = np.append(years_ur_fd, i+1)
+        final_demand = final_demand_forecast(final_demand,all_imp,years_ur_fd)
+        used_resources = used_resources_forecast(used_resources,final_demand,inverse_matrix,years_ur_fd)
+
+    return 0
     
 
 
@@ -165,13 +264,22 @@ def second_modul_main(first_module_result:DataFrame):
 if __name__ == '__main__':
     country_id = ['Армения','Беларусь','Казахстан','Кыргызстан','Российская Федерация']
     skp = ['C13','C14','C15','C21','C29','C30']
-    duties = [5,12,25,7,10,15]
+    duties = [[5,12,25,7,10,15],
+    [5,12,25,7,10,15],
+    [5,12,25,7,10,15],
+    [5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],
+    [5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15]]
     products = ['МЕХ ИСКУССТВЕННЫЙ И ИЗДЕЛИЯ ИЗ НЕГО',
     'ПРЕДМЕТЫ ОДЕЖДЫ И ПРИНАДЛЕЖНОСТИ К ОДЕЖДЕ, ИЗ НАТУРАЛЬНОЙ КОЖИ ИЛИ КОМПОЗИЦИОННОЙ КОЖИ:ПРЕДМЕТЫ ОДЕЖДЫ:ИЗ НАТУРАЛЬНОЙ КОЖИ',
     'ДУБЛ.КОЖА ИЛИ КОЖЕВЕН.КРАСТ ИЗ ШКУР К.Р.С.(ВКЛ. БУЙВОЛ),ЖИВОТ.СЕМ-ВА ЛОШАДИНЫХ,...:ВО ВЛАЖНОМ СОСТ.(ВКЛ.ХРОМИРОВАНН.ПОЛУФАБРИКАТ):НЕШЛИФОВ.ЛИЦЕВЫЕ НЕДВОЕНЫЕ;ЛИЦЕВЫЕ ДВОЕНЫЕ:ИЗ ЦЕЛЫХ ШКУР К.Р.С.(ВКЛ.БУЙВОЛ),ПЛОЩАДЬ ПОВЕРХН.КОТ.< 2,6 М2 (28 КВАДРАТ.ФУТОВ)',
     'КИСЛОТЫ КАРБОНОВЫЕ, СОДЕРЖАЩИЕ ФЕНОЛЬНУЮ ГРУППУ, НО НЕ СОДЕРЖАЩИЕ ДРУГУЮ КИСЛОРОДСОДЕРЖАЩУЮ ФУНКЦИОНАЛЬНУЮ ГРУППУ, ИХ АНГИДРИДЫ, ГАЛОГЕНАНГИДРИДЫ, ПЕРОКСИДЫ, ПЕРОКСИКИСЛОТЫ И ИХ ПРОИЗВОДНЫЕ: САЛИЦИЛОВАЯ КИСЛОТА И ЕЕ СОЛИ',
     'ПРОЧИЕ ИЗДЕЛИЯ ИЗ СВИНЦА:ПРОЧИЕ',
     'ЖЕЛЕЗНОДОРОЖНЫЕ ЛОКОМОТИВЫ, С ПИТАНИЕМ ОТ ВНЕШНЕГО ИСТОЧНИКА ЭЛЕКТРОЭНЕРГИИ, ИЛИ АККУМУЛЯТОРНЫЕ: С ПИТАНИЕМ ОТ ЭЛЕКТРИЧЕСКИХ АККУМУЛЯТОРОВ']
-    res = first_modul_main(country_id,skp,products,duties,2035,0.05,11000.0)
-    res_2 = second_modul_main(res)
+    user_year = 2035
+    alpha = 0.05
+    alpha_exp = 0.03
+    exchange_rate = 11000.0
+    res = first_modul_main(country_id,skp,products,duties,user_year,alpha,exchange_rate)
+    res_2 = second_modul_main(res,user_year,skp,alpha,alpha_exp)
     print(res)
+    print(res_2)
