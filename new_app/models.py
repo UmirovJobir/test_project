@@ -55,14 +55,14 @@ class X_and_C_for_db(models.Model):
 
 class Matrix(models.Model):
     A = models.FloatField(null=True, blank=True)
-    C = models.FloatField(null=True, blank=True)
     B = models.FloatField(null=True, blank=True)
+    C = models.FloatField(null=True, blank=True)
     D = models.FloatField(null=True, blank=True)
     E = models.FloatField(null=True, blank=True)
     F = models.FloatField(null=True, blank=True)
     G = models.FloatField(null=True, blank=True)
-    I = models.FloatField(null=True, blank=True)
     H = models.FloatField(null=True, blank=True)
+    I = models.FloatField(null=True, blank=True)
     J = models.FloatField(null=True, blank=True)
     K = models.FloatField(null=True, blank=True)
     L = models.FloatField(null=True, blank=True)
