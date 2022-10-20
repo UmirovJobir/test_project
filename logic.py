@@ -128,27 +128,27 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
 
 #SECOND MODUL
 
-def creating_all_import(all_import_export:DataFrame):
+def creating_all_import(all_import_export:DataFrame): #creating import dataframe from DB to all skp groups
     all_import = all_import_export.drop(columns=['export'],axis=1)
     all_import.rename(columns={'year': 'year_number'},inplace=True)
     return all_import
 
-def creating_all_export(all_import_export:DataFrame):
+def creating_all_export(all_import_export:DataFrame): #creating export dataframe from DB to all skp groups
     all_export = all_import_export.drop(columns=['_import'],axis=1)
     all_export.rename(columns={'year': 'year_number'},inplace=True)
     return all_export
 
-def creating_all_used_resources(all_used_resources_final_demand:DataFrame):
+def creating_all_used_resources(all_used_resources_final_demand:DataFrame): #creating all_used_resources dataframe from DB to all skp groups
     all_used_resources = all_used_resources_final_demand.drop(columns=['final_demand'],axis=1)
     all_used_resources.rename(columns={'year': 'year_number'},inplace=True)
     return all_used_resources
 
-def creating_all_final_demand(all_used_resources_final_demand:DataFrame):
+def creating_all_final_demand(all_used_resources_final_demand:DataFrame): #creating all_final_demand dataframe from DB to all skp groups
     all_final_demand = all_used_resources_final_demand.drop(columns=['all_used_resources'],axis=1)
     all_final_demand.rename(columns={'year': 'year_number'},inplace=True)
     return all_final_demand
 
-def other_import(all_imp:DataFrame,imp:DataFrame,skp:list,years:ndarray):
+def other_import(all_imp:DataFrame,imp:DataFrame,skp:list,years:ndarray): #deduction of modified import to selected countries from total import
     import_frame = imp.loc[imp['year_number'] == years[-1]]
     all_imp_frame = all_imp.loc[all_imp['year_number'] == years[-1]]
     all_imp = all_imp.loc[all_imp['year_number'] != years[-1]]
@@ -160,7 +160,7 @@ def other_import(all_imp:DataFrame,imp:DataFrame,skp:list,years:ndarray):
     all_imp = pd.concat([all_imp,all_imp_frame])
     return all_imp
 
-def import_forecast(other_imp:DataFrame,years:ndarray,alpha:float):
+def import_forecast(other_imp:DataFrame,years:ndarray,alpha:float): #forecasting total import excluding import to selected countries
     skp = other_imp['skp'].unique()
     new_imp = other_imp[other_imp['year_number'] == years[-2]]
     new_imp.set_index('skp',drop=False,inplace=True)
@@ -170,11 +170,11 @@ def import_forecast(other_imp:DataFrame,years:ndarray,alpha:float):
         elif ((i.find('Q') != -1 or i.find('D') != -1 or i.find('J') != -1 or i.find('K') != -1 or i.find('S') != -1 or i.find('I') != -1 or i.find('N') != -1 or i.find('M') != -1 or i.find('R') != -1 or i.find('E') != -1) and years[-1] >= 2025):
             new_imp.loc[i,'_import'] *= (1 + alpha)
     new_imp.reset_index(drop=True,inplace=True)
-    new_imp.loc[:,'year_number'] = years[-1]
+    new_imp['year_number'] = years[-1]
     other_imp = pd.concat([other_imp,new_imp])
     return other_imp
 
-def export_forecast(all_exp:DataFrame,years:ndarray,alpha_exp:float):
+def export_forecast(all_exp:DataFrame,years:ndarray,alpha_exp:float): #forecasting total export
     skp = all_exp['skp'].unique()
     new_exp = all_exp[all_exp['year_number'] == years[-2]]
     new_exp.set_index('skp',drop=False,inplace=True)
@@ -184,11 +184,11 @@ def export_forecast(all_exp:DataFrame,years:ndarray,alpha_exp:float):
         elif ((i.find('Q') != -1 or i.find('D') != -1 or i.find('J') != -1 or i.find('K') != -1 or i.find('S') != -1 or i.find('I') != -1 or i.find('N') != -1 or i.find('M') != -1 or i.find('R') != -1 or i.find('E') != -1) and years[-1] >= 2025):
             new_exp.loc[i,'export'] *= (1 + alpha_exp)
     new_exp.reset_index(drop=True,inplace=True)
-    new_exp.loc[:,'year_number'] = years[-1]
+    new_exp['year_number'] = years[-1]
     all_exp = pd.concat([all_exp,new_exp])
     return all_exp    
 
-def final_import_forecast(other_imp:DataFrame,imp:DataFrame,starting_year:int,skp:list):
+def final_import_forecast(other_imp:DataFrame,imp:DataFrame,starting_year:int,skp:list): #forecasting total import, taking into account import to selected countries
     all_imp = other_imp.loc[other_imp['year_number'] < starting_year + 1]
     import_frame = imp.loc[imp['year_number'] >= starting_year + 1]
     all_imp_frame = other_imp.loc[other_imp['year_number'] >= starting_year + 1]
@@ -200,7 +200,7 @@ def final_import_forecast(other_imp:DataFrame,imp:DataFrame,starting_year:int,sk
     all_imp = pd.concat([all_imp,all_imp_frame])
     return all_imp
 
-def final_demand_forecast(final_demand:DataFrame,all_imp:DataFrame,years:ndarray):
+def final_demand_forecast(final_demand:DataFrame,all_imp:DataFrame,years:ndarray): #forecasting final demand
     skp = final_demand['skp'].unique()
     new_final_demand = final_demand[final_demand['year_number'] == years[-2]]
     old_import = all_imp[all_imp['year_number'] == years[-2]]
@@ -210,11 +210,11 @@ def final_demand_forecast(final_demand:DataFrame,all_imp:DataFrame,years:ndarray
     for i in skp:
         new_final_demand.loc[i,'final_demand'] = old_final_demand.loc[i,'final_demand'] + 0.2 * old_import.loc[i,'_import']
     new_final_demand.reset_index(drop=True,inplace=True)
-    new_final_demand.loc[:,'year_number'] = years[-1]
+    new_final_demand['year_number'] = years[-1]
     final_demand = pd.concat([final_demand,new_final_demand])
     return final_demand
 
-def create_inverse_matrix(technological_matrix:DataFrame):
+def create_inverse_matrix(technological_matrix:DataFrame): #creation of the inverse matrix of the technological matrix
     identity_matrix = np.eye(78)
     technological_matrix.drop(columns=['id'],axis=1,inplace=True)
     technological_matrix = technological_matrix.astype(np.float64).to_numpy()
@@ -222,14 +222,17 @@ def create_inverse_matrix(technological_matrix:DataFrame):
     inverse_matrix = np.linalg.inv(technological_matrix)
     return inverse_matrix
 
-def used_resources_forecast(used_resources:DataFrame,final_demand:DataFrame,inverse_matrix:ndarray,years:ndarray):
+def used_resources_forecast(used_resources:DataFrame,final_demand:DataFrame,inverse_matrix:ndarray,years:ndarray): #forecasting used resources
     new_used_resources = used_resources[used_resources['year_number'] == years[-2]]
     final_demand_frame = final_demand[final_demand['year_number'] == years[-1]]
     c = final_demand_frame['final_demand'].values
     x = np.dot(inverse_matrix,c)
+    new_used_resources['all_used_resources'] = x
+    new_used_resources['year_number'] = years[-1]
+    used_resources = pd.concat([used_resources,new_used_resources])
     return used_resources
 
-def second_modul_main(first_module_result:DataFrame,user_year:int,skp:list,alpha:float,alpha_exp:float):
+def second_modul_main(first_module_result:DataFrame,user_year:int,skp:list,alpha:float,alpha_exp:float): #we take the result of the work of the first module and the alpha of exports, the result is a forecast of GDP by type of activity
     technological_matrix = db_clint.matrix()
     inverse_matrix = create_inverse_matrix(technological_matrix)
     all_import_export = db_clint.import_export_for_db()
@@ -249,7 +252,9 @@ def second_modul_main(first_module_result:DataFrame,user_year:int,skp:list,alpha
         other_imp = import_forecast(other_imp,years_imp_exp,alpha)
         all_exp = export_forecast(all_exp,years_imp_exp,alpha_exp)
     all_imp = final_import_forecast(other_imp,first_module_result,starting_point,skp)
-    
+    all_exp.fillna(0,inplace=True)
+    all_imp.fillna(0,inplace=True)
+
     starting_point_1 = years_ur_fd[-1]
     for i in range(starting_point_1,user_year):
         years_ur_fd = np.append(years_ur_fd, i+1)
