@@ -32,6 +32,11 @@ class Database:
         df = pd.read_sql_query(query, connection)
         return df
     
+    def gdp():
+        query = str(Gdp.objects.all().query)
+        df = pd.read_sql_query(query, connection)
+        return df
+    
         
 
 
