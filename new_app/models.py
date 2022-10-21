@@ -66,6 +66,7 @@ class X_and_C_for_db(models.Model):
 
     def __str__(self):
         return self.name
+    
 
 class Matrix(models.Model):
     A = models.FloatField(null=True, blank=True)

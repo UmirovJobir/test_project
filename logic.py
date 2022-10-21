@@ -1,3 +1,6 @@
+import os,django
+os.environ.setdefault ("DJANGO_SETTINGS_MODULE", "strategy_agency.settings")
+django.setup()
 
 from new_app.libs.psql import db_clint
 import numpy as np
