@@ -38,6 +38,14 @@ class Detail(models.Model):
     class Meta:
         verbose_name_plural = 'Details'
 
+class Gdp(models.Model):
+    name = models.CharField(max_length=300)
+    economic_activity = models.CharField(max_length=50)
+    gdp = models.FloatField(null=True, blank=True)
+    year_number = models.IntegerField()
+
+    def __str__(self):
+        return self.name
 
 class Import_export_for_db(models.Model):
     name = models.CharField(max_length=300)
@@ -46,12 +54,18 @@ class Import_export_for_db(models.Model):
     _import	= models.FloatField(null=True, blank=True)
     export = models.FloatField(null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
 class X_and_C_for_db(models.Model):
     name = models.CharField(max_length=300)
     skp = models.CharField(max_length=50)
     year = models.IntegerField()
     all_used_resources	= models.FloatField(null=True, blank=True)
     final_demand = models.FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
 class Matrix(models.Model):
     A = models.FloatField(null=True, blank=True)

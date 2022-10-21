@@ -11,6 +11,7 @@ from logic import (
     year,
     
 )
+from strategy_agency.settings import DATABASES
 
 # All countries
 class Country_view(APIView):  

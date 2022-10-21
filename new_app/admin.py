@@ -3,15 +3,17 @@ from import_export.admin import ImportExportActionModelAdmin
 
 from django.contrib import admin
 from .models import (
+    Gdp,
     Product, 
     Detail, 
     Country, 
     Import_export_for_db, 
     X_and_C_for_db, 
-    Matrix
+    Matrix,
+    Gdp
 )
 
-@admin.register(Import_export_for_db, X_and_C_for_db, Matrix)
+@admin.register(Import_export_for_db, X_and_C_for_db, Matrix, Gdp)
 class Admin(ImportExportActionModelAdmin):
     pass
 
