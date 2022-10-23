@@ -1,0 +1,3 @@
+POSTGRES_DB='strategy_agency'
+POSTGRES_HOST='pgdb'
+POSTGRES_PORT='5432'
