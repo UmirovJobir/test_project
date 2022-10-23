@@ -13,8 +13,6 @@ class Database:
             return df
 
     def import_export_for_db():
-        # query = str(Import_export_for_db.objects.all().query)
-        # df = pd.read_sql_query(query, connection)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT * FROM public.new_app_import_export_for_db
                                  ORDER BY id ASC """)
@@ -23,20 +21,25 @@ class Database:
             return df
         
     def x_and_c_for_db():
-        query = str(X_and_C_for_db.objects.all().query)
-        df = pd.read_sql_query(query, connection)
-        return df
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM public.new_app_x_and_c_for_db
+                                ORDER BY id ASC """)
+            row = cursor.fetchall()
+            df = pd.DataFrame(row, columns =['id','name','skp','year','all_used_resources','final_demand'])
+            return df
+    
+    def gdp():
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM public.new_app_gdp
+                                ORDER BY id ASC""")
+            row = cursor.fetchall()
+            df = pd.DataFrame(row, columns =['id','name','economic_activity','gdp','year'])
+            return df
 
     def matrix():
         query = str(Matrix.objects.all().query)
         df = pd.read_sql_query(query, connection)
         return df
-    
-    def gdp():
-        query = str(Gdp.objects.all().query)
-        df = pd.read_sql_query(query, connection)
-        return df
-    
         
 
 

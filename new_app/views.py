@@ -1,17 +1,16 @@
-from .models import Product, Detail, Country
+from time import process_time
+from .models import Product, Detail, Country, Gdp, Year, Import_export_for_db
 from .serializers import Detail_serializer, Product_serializer, Country_serializer, Product_serializer_details
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core.exceptions import SuspiciousOperation
 from django.http import JsonResponse
 import json
+import pandas as pd
 from new_app.libs.psql import db_clint
-from logic import (
-    first_modul_main,
-    year,
-    
-)
-from strategy_agency.settings import DATABASES
+from python_files.logic import first_modul_main
+
+
 
 # All countries
 class Country_view(APIView):  
@@ -33,7 +32,6 @@ class Detail(APIView):
     def get(self, request):  
         try:
             countries = request.data['country_id']
-            print(countries)
             products = Product.objects.filter(pk__in=request.data.get('product_id'))
             serializer = Product_serializer_details(products, many=True, context={'request': request, "country_id": countries})
             return Response(serializer.data)
@@ -45,7 +43,6 @@ class Detail(APIView):
 # API gets request (country_id, product_id, duties, year, percent, exchange_rate, percent) and response a future data of skp
 class Data(APIView):
     def get(self, request):
-        print(request.data)
         country_id = request.data['country_id']
         product_id = request.data['product_id']
         duties = request.data['duty']
@@ -77,7 +74,46 @@ class Data(APIView):
         print(res)
         return Response(res)
 
-        # return Response(data={"res": res, "res_2":res})
+
+class SaveDataView(APIView):
+    def get(self, request):
+        file = request.data['file']
+        file_name = f'{file}'
+        if file_name=='gdp_for_db.xlsx':
+            df = pd.read_excel(f"excel_files/{file}")
+            df = df.fillna('-')
+            print(df)
+            # for i in df.values:
+            #     print(i[0])
+
+            #     try:
+            #         year = Year.objects.get(year_number=i[3])
+            #     except Year.DoesNotExist:
+            #         year = Year.objects.create(year_number=i[3])
+
+            #     try:
+            #         Gdp.objects.get(name=i[0],economic_activity=i[1],gdp=i[2],year_number=year)
+            #     except Gdp.DoesNotExist:
+            #         Gdp.objects.create(name=i[0],economic_activity=i[1],gdp=i[2],year_number=year)
+        
+        if file_name=='import_export_for_db.xlsx':
+            df = pd.read_excel(f"excel_files/{file}")
+            df = df.fillna('-')
+            for i in df.values:
+                print(i)
+                # try:
+                #     year = Year.objects.get(year_number=i[3])
+                # except Year.DoesNotExist:
+                #     year = Year.objects.create(year_number=i[3])
+
+                try:
+                    query = Import_export_for_db.objects.get(name=i[0],skp=i[1],year=i[2],_import=i[3],export=i[4])
+                except Import_export_for_db.DoesNotExist:
+                    query = Import_export_for_db.objects.create(name=i[0],skp=i[1],year=i[2],_import=i[3],export=i[4])
+                
+                print(query)
+
+        return Response(data={"status": "success"})
 
 
 # data for Doston skp_list, country_list, sql_query
