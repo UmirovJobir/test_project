@@ -9,6 +9,13 @@ from sklearn.linear_model import LinearRegression
 from numpy import inner, ndarray, product
 from pandas import DataFrame
 
+def swap_columns(df,col1,col2):
+    col_list = list(df.columns)
+    x,y = col_list.index(col1),col_list.index(col2)
+    col_list[y],col_list[x] = col_list[x],col_list[y]
+    df = df[col_list]
+    return df
+
 #FIRST MODUL
 
 def data_reading(countries:list,skp:list): #returning filtered DataFrame with all skp and country product groups entered by the user (lists from Djobir)
@@ -134,16 +141,19 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
 def creating_all_import(all_import_export:DataFrame): #creating import dataframe from DB to all skp groups
     all_import = all_import_export.drop(columns=['export'],axis=1)
     all_import.rename(columns={'year': 'year_number'},inplace=True)
+    all_import = swap_columns(all_import,'_import','year_number')
     return all_import
 
 def creating_all_export(all_import_export:DataFrame): #creating export dataframe from DB to all skp groups
     all_export = all_import_export.drop(columns=['_import'],axis=1)
     all_export.rename(columns={'year': 'year_number'},inplace=True)
+    all_export = swap_columns(all_export,'export','year_number')
     return all_export
 
 def creating_all_used_resources(all_used_resources_final_demand:DataFrame): #creating all_used_resources dataframe from DB to all skp groups
     all_used_resources = all_used_resources_final_demand.drop(columns=['final_demand'],axis=1)
     all_used_resources.rename(columns={'year': 'year_number'},inplace=True)
+    all_used_resources = swap_columns(all_used_resources,'all_used_resources','year_number')
     return all_used_resources
 
 def creating_all_final_demand(all_used_resources_final_demand:DataFrame): #creating all_final_demand dataframe from DB to all skp groups
@@ -235,11 +245,27 @@ def used_resources_forecast(used_resources:DataFrame,final_demand:DataFrame,inve
     used_resources = pd.concat([used_resources,new_used_resources])
     return used_resources
 
+def creating_economic_activity(data:DataFrame,economic_activities:ndarray,economic_activities_name:ndarray):
+    years = year(data)
+    cols = data.columns
+    columns = ['name','economic_activity','value','year_number']
+    economic_activities_frame = pd.DataFrame(columns=columns)
+    for i in years:
+        k = 0
+        for j in economic_activities:
+            frame = data[(data['year_number'] == i) & (data['skp'].str.contains(j))]
+            economic_activities_frame.loc[len(economic_activities_frame.index)] = [economic_activities_name[k],j,frame[cols[3]].sum(),i]
+            k += 1
+    return economic_activities_frame
+
 def second_modul_main(first_module_result:DataFrame,user_year:int,skp:list,alpha:float,alpha_exp:float): #we take the result of the work of the first module and the alpha of exports, the result is a forecast of GDP by type of activity
     technological_matrix = db_clint.matrix()
     inverse_matrix = create_inverse_matrix(technological_matrix)
     all_import_export = db_clint.import_export_for_db()
     all_used_resources_final_demand = db_clint.x_and_c_for_db()
+    gdp = db_clint.gdp()
+    economic_activities = gdp['economic_activity'].unique()
+    economic_activities_name = gdp['name'].unique()
     years_imp_exp = all_import_export['year'].unique()
     years_ur_fd = all_used_resources_final_demand['year'].unique()
 
@@ -264,6 +290,12 @@ def second_modul_main(first_module_result:DataFrame,user_year:int,skp:list,alpha
         final_demand = final_demand_forecast(final_demand,all_imp,years_ur_fd)
         used_resources = used_resources_forecast(used_resources,final_demand,inverse_matrix,years_ur_fd)
 
+    economic_activity_import = creating_economic_activity(all_imp,economic_activities,economic_activities_name)
+    economic_activity_export = creating_economic_activity(all_exp,economic_activities,economic_activities_name)
+    economic_activity_used_resources = creating_economic_activity(used_resources,economic_activities,economic_activities_name)
+    
+
+    
     return 0
     
 
