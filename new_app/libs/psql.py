@@ -18,7 +18,7 @@ class Database:
                                 from new_app_import_export_for_db a, new_app_year b
                                 where a.year_id=b.id;""")
             row = cursor.fetchall()
-            df = pd.DataFrame(row, columns =['id','name','skp','year','_import','export'])
+            df = pd.DataFrame(row, columns =['name','skp','year','_import','export'])
             return df
         
     def x_and_c_for_db():
@@ -27,7 +27,7 @@ class Database:
                                 from new_app_x_and_c_for_db a, new_app_year b
                                 where a.year_id=b.id;""")
             row = cursor.fetchall()
-            df = pd.DataFrame(row, columns =['id','name','skp','year','all_used_resources','final_demand'])
+            df = pd.DataFrame(row, columns =['name','skp','year','all_used_resources','final_demand'])
             return df
     
     def gdp():
@@ -36,7 +36,7 @@ class Database:
                                 from new_app_gdp a, new_app_year b
                                 where a.year_id=b.id;""")
             row = cursor.fetchall()
-            df = pd.DataFrame(row, columns =['id','name','economic_activity','gdp','year'])
+            df = pd.DataFrame(row, columns =['name','economic_activity','gdp','year'])
             return df
 
     def matrix():
