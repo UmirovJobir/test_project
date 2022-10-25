@@ -20,15 +20,15 @@ def data_reading(countries:list,skp:list): #returning filtered DataFrame with al
     return df_with_filter
 
 def year(data:DataFrame): #func to know in which year we now
-    return data['year_number'].unique()
+    return data['year'].unique()
 
 def creating_duties(years:ndarray,data:DataFrame,skp:list): #creating skp groups duties
-    columns = ['skp','value','year_number']
+    columns = ['skp','value','year']
     duty = pd.DataFrame(columns=columns)
     for i in years:
         for j in skp:
             frame = data[(data['year_number'] == i) & (data['skp'] == j)]
-            duty.loc[len(duty.index)] = [frame['skp'].unique(),frame['duty'].mean(),frame['year_number'].unique()]
+            duty.loc[len(duty.index)] = [frame['skp'].unique(),frame['duty'].mean(),frame['year'].unique()]
     return duty
 
 def creating_import(years:ndarray,data:DataFrame,skp:list): #creating skp groups import
