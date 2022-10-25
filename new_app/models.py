@@ -154,6 +154,8 @@ class Matrix(models.Model):
     BY = models.FloatField(null=True, blank=True)
     BZ = models.FloatField(null=True, blank=True)
 
+    def __str__(self):
+        return self.A
     class Meta:
         verbose_name_plural = 'Matrix'
 

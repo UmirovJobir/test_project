@@ -16,12 +16,13 @@ from .models import (
 )
 admin.site.unregister(Group)
 
-@admin.register(Import_export_for_db, X_and_C_for_db, Matrix, Gdp)
+@admin.register(Import_export_for_db, X_and_C_for_db, Gdp)
 class Admin(ImportExportActionModelAdmin):
     pass
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
+    list_per_page = 50
     list_filter = ('country_name',)
     search_fields = ('country_name',)
 
@@ -34,6 +35,18 @@ class CountryAdmin(admin.ModelAdmin):
 # class DetailAdmin(admin.ModelAdmin):
 #     list_filter = ('product_id',)
 #     search_fields = ('product_id',)
+
+@admin.register(Matrix)
+class MatrixAdmin(admin.ModelAdmin):
+    list_per_page = 50
+    list_filter = ('A',)
+    search_fields = ('A',)
+    list_display = ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 
+                    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 
+                    'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 
+                    'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ', 'BA', 'BB', 'BC', 'BD', 'BE', 'BF', 'BG', 
+                    'BH', 'BI', 'BJ', 'BK', 'BL', 'BM', 'BN', 'BO', 'BP', 'BQ', 'BR', 'BS', 'BT', 'BU', 
+                    'BV', 'BW', 'BX', 'BY', 'BZ')
 
 
 class DetailInline(nested_admin.NestedStackedInline):

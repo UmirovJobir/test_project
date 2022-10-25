@@ -23,10 +23,6 @@ class Country_view(APIView):
 
     def get(self, request):
         countries = Country.objects.all()
-
-        # paginator = LimitOffsetPagination()
-        # result_page = paginator.paginate_queryset(countries, request)
-
         serializer = Country_serializer(countries, many=True)
         return Response(serializer.data)
 
@@ -58,13 +54,15 @@ class Data(APIView):
         product_id = request.data['product_id']
         duties = request.data['duty']
         year = request.data['year']
-        percent = request.data['percent']
+        export_percentage = request.data['export_percentage']
+        import_percentage = request.data['import_percentage']
         exchange_rate = request.data['exchange_rate']
 
         countries = []
         products = []
         skp = []
-        percent = percent/100
+        export_percentage = export_percentage/100
+        import_percentage = import_percentage/100
 
         for country in country_id:
             name = Country.objects.filter(id=country).values()
@@ -79,13 +77,13 @@ class Data(APIView):
                     skp.append(i.get('skp'))
                     products.append(i.get('product_name'))
         
-        print(countries, products, skp, duties, year, percent)
+        print(countries, products, skp, duties, year, export_percentage)
 
-        res = first_modul_main(countries,skp,products,duties,year,percent, exchange_rate)
+        res = first_modul_main(countries,skp,products,duties,year,export_percentage, exchange_rate)
         print(res)
         return Response(res)
 
-# API to save excel files
+# API to save excel files (requires login password of admin)
 class SaveDataView(APIView):
     permission_classes = [permissions.IsAdminUser]
 
