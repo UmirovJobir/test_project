@@ -266,15 +266,15 @@ def gdp_forecast(gdp:DataFrame,e_a_used_resources:DataFrame,e_a_export:DataFrame
         y_frame = gdp[gdp['economic_activity'] == i]
         y = y_frame['gdp'].values
         for j in range(years[0],years[-1]):
-            frame_1 = e_a_used_resources[(e_a_used_resources['economic_activity'] == i) & (e_a_used_resources['year_number'] == j)]
-            frame_2 = e_a_export[(e_a_export['economic_activity'] == i) & (e_a_export['year_number'] == j)]
-            frame_3 = e_a_import[(e_a_import['economic_activity'] == i) & (e_a_import['year_number'] == j)]
+            frame_1 = e_a_used_resources[(e_a_used_resources['economic_activity'] == i) & (e_a_used_resources['year'] == j)]
+            frame_2 = e_a_export[(e_a_export['economic_activity'] == i) & (e_a_export['year'] == j)]
+            frame_3 = e_a_import[(e_a_import['economic_activity'] == i) & (e_a_import['year'] == j)]
             x = np.append(x,[frame_1.iloc[0,2],frame_2.iloc[0,2],-1 * frame_3.iloc[0,2]])
         x = np.reshape(x,(years[-1]-years[0],3))
         model = LinearRegression().fit(x,y)
-        frame_1 = e_a_used_resources[(e_a_used_resources['economic_activity'] == i) & (e_a_used_resources['year_number'] == years[-1])]
-        frame_2 = e_a_export[(e_a_export['economic_activity'] == i) & (e_a_export['year_number'] == years[-1])]
-        frame_3 = e_a_import[(e_a_import['economic_activity'] == i) & (e_a_import['year_number'] == years[-1])]
+        frame_1 = e_a_used_resources[(e_a_used_resources['economic_activity'] == i) & (e_a_used_resources['year'] == years[-1])]
+        frame_2 = e_a_export[(e_a_export['economic_activity'] == i) & (e_a_export['year'] == years[-1])]
+        frame_3 = e_a_import[(e_a_import['economic_activity'] == i) & (e_a_import['year'] == years[-1])]
         new_x = np.append(new_x,[frame_1.iloc[0,2],frame_2.iloc[0,2],-1 * frame_3.iloc[0,2]])
         new_x = np.reshape(new_x,(1,3))
         y_pred = model.predict(new_x)
@@ -287,10 +287,8 @@ def second_modul_main(first_module_result:DataFrame,user_year:int,skp:list,alpha
     technological_matrix = db_clint.matrix()
     inverse_matrix = create_inverse_matrix(technological_matrix)
     all_import_export = db_clint.import_export_for_db()
-    print(all_import_export)
     all_used_resources_final_demand = db_clint.x_and_c_for_db()
     print(all_used_resources_final_demand)
-    gdp = db_clint.gdp()
     economic_activities = gdp['economic_activity'].unique()
     economic_activities_name = gdp['name'].unique()
     years_imp_exp = all_import_export['year'].unique()

@@ -23,7 +23,7 @@ class Database:
         
     def x_and_c_for_db():
         with connection.cursor() as cursor:
-            cursor.execute("""select a.name,a.skp,a.all_used_resources,a.final_demand, b.year
+            cursor.execute("""select a.name,a.skp,b.year,a.all_used_resources,a.final_demand
                                 from new_app_x_and_c_for_db a, new_app_year b
                                 where a.year_id=b.id;""")
             row = cursor.fetchall()
