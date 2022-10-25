@@ -27,24 +27,24 @@ def data_reading(countries:list,skp:list): #returning filtered DataFrame with al
     return df_with_filter
 
 def year(data:DataFrame): #func to know in which year we now
-    return data['year_number'].unique()
+    return data['year'].unique()
 
 def creating_duties(years:ndarray,data:DataFrame,skp:list): #creating skp groups duties
-    columns = ['skp','value','year_number']
+    columns = ['skp','value','year']
     duty = pd.DataFrame(columns=columns)
     for i in years:
         for j in skp:
-            frame = data[(data['year_number'] == i) & (data['skp'] == j)]
-            duty.loc[len(duty.index)] = [frame['skp'].unique(),frame['duty'].mean(),frame['year_number'].unique()]
+            frame = data[(data['year'] == i) & (data['skp'] == j)]
+            duty.loc[len(duty.index)] = [frame['skp'].unique(),frame['duty'].mean(),frame['year'].unique()]
     return duty
 
 def creating_import(years:ndarray,data:DataFrame,skp:list): #creating skp groups import
-    columns = ['skp','value','year_number']
+    columns = ['skp','value','year']
     imp = pd.DataFrame(columns=columns)
     for i in years:
         for j in skp:
-            frame = data[(data['year_number'] == i) & (data['skp'] == j)]
-            imp.loc[len(imp.index)] = [frame['skp'].unique(),frame['price'].sum(),frame['year_number'].unique()]
+            frame = data[(data['year'] == i) & (data['skp'] == j)]
+            imp.loc[len(imp.index)] = [frame['skp'].unique(),frame['price'].sum(),frame['year'].unique()]
     return imp
 
 def elasticity_calculating(duty:DataFrame,imp:DataFrame,skp:list): #calculating elasticity for skp groups
@@ -88,23 +88,23 @@ def elasticity_calculating(duty:DataFrame,imp:DataFrame,skp:list): #calculating 
     return elast
 
 def adding_new_duties_to_df(data:DataFrame,products:list,duties:list,years:ndarray): #adding new duties from user to DF (lists from Djobir)
-    new_duties = data[data['year_number'] == years[-2]]
+    new_duties = data[data['year'] == years[-2]]
     new_duties.set_index('product_name',drop=False,inplace=True)
     j = 0
     for i in products:
         new_duties.loc[i,'duty'] = duties[j]
         j += 1
     new_duties.reset_index(drop=True,inplace=False)
-    new_duties.loc[:,'year_number'] = years[-1]
+    new_duties.loc[:,'year'] = years[-1]
     data = pd.concat([data,new_duties])
     return data
 
 def adding_new_import(years:ndarray,skp:list,elasticity:ndarray,alpha:float,duty:DataFrame,imp:DataFrame): #import forecast for the new year
     j = 0
     for i in skp:
-        new_duty = duty.loc[(duty['skp'] == i) & (duty['year_number'] == years[-1])]
-        old_duty = duty.loc[(duty['skp'] == i) & (duty['year_number'] == years[-2])]
-        old_import = imp.loc[(imp['skp'] == i) & (imp['year_number'] == years[-2])]
+        new_duty = duty.loc[(duty['skp'] == i) & (duty['year'] == years[-1])]
+        old_duty = duty.loc[(duty['skp'] == i) & (duty['year'] == years[-2])]
+        old_import = imp.loc[(imp['skp'] == i) & (imp['year'] == years[-2])]
         new_duty = new_duty['value'].values
         old_duty = old_duty['value'].values
         old_import = old_import['value'].values
@@ -140,31 +140,31 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
 
 def creating_all_import(all_import_export:DataFrame): #creating import dataframe from DB to all skp groups
     all_import = all_import_export.drop(columns=['export'],axis=1)
-    all_import.rename(columns={'year': 'year_number'},inplace=True)
-    all_import = swap_columns(all_import,'_import','year_number')
+    all_import.rename(columns={'year': 'year'},inplace=True)
+    all_import = swap_columns(all_import,'_import','year')
     return all_import
 
 def creating_all_export(all_import_export:DataFrame): #creating export dataframe from DB to all skp groups
     all_export = all_import_export.drop(columns=['_import'],axis=1)
-    all_export.rename(columns={'year': 'year_number'},inplace=True)
-    all_export = swap_columns(all_export,'export','year_number')
+    all_export.rename(columns={'year': 'year'},inplace=True)
+    all_export = swap_columns(all_export,'export','year')
     return all_export
 
 def creating_all_used_resources(all_used_resources_final_demand:DataFrame): #creating all_used_resources dataframe from DB to all skp groups
     all_used_resources = all_used_resources_final_demand.drop(columns=['final_demand'],axis=1)
-    all_used_resources.rename(columns={'year': 'year_number'},inplace=True)
-    all_used_resources = swap_columns(all_used_resources,'all_used_resources','year_number')
+    all_used_resources.rename(columns={'year': 'year'},inplace=True)
+    all_used_resources = swap_columns(all_used_resources,'all_used_resources','year')
     return all_used_resources
 
 def creating_all_final_demand(all_used_resources_final_demand:DataFrame): #creating all_final_demand dataframe from DB to all skp groups
     all_final_demand = all_used_resources_final_demand.drop(columns=['all_used_resources'],axis=1)
-    all_final_demand.rename(columns={'year': 'year_number'},inplace=True)
+    all_final_demand.rename(columns={'year': 'year'},inplace=True)
     return all_final_demand
 
 def other_import(all_imp:DataFrame,imp:DataFrame,skp:list,years:ndarray): #deduction of modified import to selected countries from total import
-    import_frame = imp.loc[imp['year_number'] == years[-1]]
-    all_imp_frame = all_imp.loc[all_imp['year_number'] == years[-1]]
-    all_imp = all_imp.loc[all_imp['year_number'] != years[-1]]
+    import_frame = imp.loc[imp['year'] == years[-1]]
+    all_imp_frame = all_imp.loc[all_imp['year'] == years[-1]]
+    all_imp = all_imp.loc[all_imp['year'] != years[-1]]
     all_imp_frame.set_index('skp',drop=False,inplace=True)
     import_frame.set_index('skp',drop=False,inplace=True)
     for i in skp:
@@ -175,7 +175,7 @@ def other_import(all_imp:DataFrame,imp:DataFrame,skp:list,years:ndarray): #deduc
 
 def import_forecast(other_imp:DataFrame,years:ndarray,alpha:float): #forecasting total import excluding import to selected countries
     skp = other_imp['skp'].unique()
-    new_imp = other_imp[other_imp['year_number'] == years[-2]]
+    new_imp = other_imp[other_imp['year'] == years[-2]]
     new_imp.set_index('skp',drop=False,inplace=True)
     for i in skp:
         if ((i.find('F') != -1 or i.find('H') != -1 or i.find('G') != -1 or i.find('B') != -1 or i.find('L') != -1 or i.find('O') != -1 or i.find('P') != -1) and years[-1] >= 2030):
@@ -183,13 +183,13 @@ def import_forecast(other_imp:DataFrame,years:ndarray,alpha:float): #forecasting
         elif ((i.find('Q') != -1 or i.find('D') != -1 or i.find('J') != -1 or i.find('K') != -1 or i.find('S') != -1 or i.find('I') != -1 or i.find('N') != -1 or i.find('M') != -1 or i.find('R') != -1 or i.find('E') != -1) and years[-1] >= 2025):
             new_imp.loc[i,'_import'] *= (1 + alpha)
     new_imp.reset_index(drop=True,inplace=True)
-    new_imp['year_number'] = years[-1]
+    new_imp['year'] = years[-1]
     other_imp = pd.concat([other_imp,new_imp])
     return other_imp
 
 def export_forecast(all_exp:DataFrame,years:ndarray,alpha_exp:float): #forecasting total export
     skp = all_exp['skp'].unique()
-    new_exp = all_exp[all_exp['year_number'] == years[-2]]
+    new_exp = all_exp[all_exp['year'] == years[-2]]
     new_exp.set_index('skp',drop=False,inplace=True)
     for i in skp:
         if ((i.find('F') != -1 or i.find('H') != -1 or i.find('G') != -1 or i.find('B') != -1 or i.find('L') != -1 or i.find('O') != -1 or i.find('P') != -1) and years[-1] >= 2030):
@@ -197,14 +197,14 @@ def export_forecast(all_exp:DataFrame,years:ndarray,alpha_exp:float): #forecasti
         elif ((i.find('Q') != -1 or i.find('D') != -1 or i.find('J') != -1 or i.find('K') != -1 or i.find('S') != -1 or i.find('I') != -1 or i.find('N') != -1 or i.find('M') != -1 or i.find('R') != -1 or i.find('E') != -1) and years[-1] >= 2025):
             new_exp.loc[i,'export'] *= (1 + alpha_exp)
     new_exp.reset_index(drop=True,inplace=True)
-    new_exp['year_number'] = years[-1]
+    new_exp['year'] = years[-1]
     all_exp = pd.concat([all_exp,new_exp])
     return all_exp    
 
 def final_import_forecast(other_imp:DataFrame,imp:DataFrame,starting_year:int,skp:list): #forecasting total import, taking into account import to selected countries
-    all_imp = other_imp.loc[other_imp['year_number'] < starting_year + 1]
-    import_frame = imp.loc[imp['year_number'] >= starting_year + 1]
-    all_imp_frame = other_imp.loc[other_imp['year_number'] >= starting_year + 1]
+    all_imp = other_imp.loc[other_imp['year'] < starting_year + 1]
+    import_frame = imp.loc[imp['year'] >= starting_year + 1]
+    all_imp_frame = other_imp.loc[other_imp['year'] >= starting_year + 1]
     all_imp_frame.set_index('skp',drop=False,inplace=True)
     import_frame.set_index('skp',drop=False,inplace=True)
     for i in skp:
@@ -215,15 +215,15 @@ def final_import_forecast(other_imp:DataFrame,imp:DataFrame,starting_year:int,sk
 
 def final_demand_forecast(final_demand:DataFrame,all_imp:DataFrame,years:ndarray): #forecasting final demand
     skp = final_demand['skp'].unique()
-    new_final_demand = final_demand[final_demand['year_number'] == years[-2]]
-    old_import = all_imp[all_imp['year_number'] == years[-2]]
+    new_final_demand = final_demand[final_demand['year'] == years[-2]]
+    old_import = all_imp[all_imp['year'] == years[-2]]
     new_final_demand.set_index('skp',drop=False,inplace=True)
     old_import.set_index('skp',drop=False,inplace=True)
     old_final_demand = new_final_demand
     for i in skp:
         new_final_demand.loc[i,'final_demand'] = old_final_demand.loc[i,'final_demand'] + 0.2 * old_import.loc[i,'_import']
     new_final_demand.reset_index(drop=True,inplace=True)
-    new_final_demand['year_number'] = years[-1]
+    new_final_demand['year'] = years[-1]
     final_demand = pd.concat([final_demand,new_final_demand])
     return final_demand
 
@@ -236,24 +236,24 @@ def create_inverse_matrix(technological_matrix:DataFrame): #creation of the inve
     return inverse_matrix
 
 def used_resources_forecast(used_resources:DataFrame,final_demand:DataFrame,inverse_matrix:ndarray,years:ndarray): #forecasting used resources
-    new_used_resources = used_resources[used_resources['year_number'] == years[-2]]
-    final_demand_frame = final_demand[final_demand['year_number'] == years[-1]]
+    new_used_resources = used_resources[used_resources['year'] == years[-2]]
+    final_demand_frame = final_demand[final_demand['year'] == years[-1]]
     c = final_demand_frame['final_demand'].values
     x = np.dot(inverse_matrix,c)
     new_used_resources['all_used_resources'] = x
-    new_used_resources['year_number'] = years[-1]
+    new_used_resources['year'] = years[-1]
     used_resources = pd.concat([used_resources,new_used_resources])
     return used_resources
 
 def creating_economic_activity(data:DataFrame,economic_activities:ndarray,economic_activities_name:ndarray): #association of commodity industries into types of economic activity
     years = year(data)
     cols = data.columns
-    columns = ['name','economic_activity','value','year_number']
+    columns = ['name','economic_activity','value','year']
     economic_activities_frame = pd.DataFrame(columns=columns)
     for i in years:
         k = 0
         for j in economic_activities:
-            frame = data[(data['year_number'] == i) & (data['skp'].str.contains(j))]
+            frame = data[(data['year'] == i) & (data['skp'].str.contains(j))]
             economic_activities_frame.loc[len(economic_activities_frame.index)] = [economic_activities_name[k],j,frame[cols[3]].sum(),i]
             k += 1
     return economic_activities_frame
@@ -348,6 +348,6 @@ if __name__ == '__main__':
     alpha_exp = 0.03
     exchange_rate = 11000.0
     res = first_modul_main(country_id,skp,products,duties,user_year,alpha,exchange_rate)
-    res_2 = second_modul_main(res,user_year,skp,alpha,alpha_exp)
     print(res)
+    res_2 = second_modul_main(res,user_year,skp,alpha,alpha_exp)
     print(res_2)

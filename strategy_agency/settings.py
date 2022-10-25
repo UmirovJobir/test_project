@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'import_export',
     'drf_yasg',
-    'debug_toolbar'
+    'debug_toolbar',
+    'nested_admin'
 ]
 
 MIDDLEWARE = [
@@ -157,3 +158,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_PAGINATION_CLASS': 
+#         'rest_framework.pagination.DESIRED_PAGINATION_STYLE',
+#     'PAGE_SIZE': 100
+# }

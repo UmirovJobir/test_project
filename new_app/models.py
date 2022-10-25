@@ -2,10 +2,10 @@ from django.db import models
 
 
 class Year(models.Model):
-    year_number = models.IntegerField(unique=True)
+    year = models.IntegerField(unique=True)
 
     def __str__(self):
-        return self.year_number
+        return f'{self.year}'
 
 
 class Country(models.Model):
@@ -31,7 +31,7 @@ class Product(models.Model):
 class Detail(models.Model):
     price = models.FloatField(null=True, blank=True)
     duty = models.FloatField(null=True, blank=True)
-    year = models.ForeignKey(Year, on_delete=models.CASCADE, related_name='year')
+    year = models.ForeignKey(Year, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='details')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='countries')
 
@@ -42,31 +42,37 @@ class Gdp(models.Model):
     name = models.CharField(max_length=300)
     economic_activity = models.CharField(max_length=50)
     gdp = models.FloatField(null=True, blank=True)
-    year_number = models.IntegerField()
+    year = models.ForeignKey(Year, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
+    class Meta:
+        verbose_name_plural = 'Gdp'
 
 class Import_export_for_db(models.Model):
     name = models.CharField(max_length=300)
     skp = models.CharField(max_length=50)
-    year = models.IntegerField()
+    year = models.ForeignKey(Year, on_delete=models.CASCADE)
     _import	= models.FloatField(null=True, blank=True)
     export = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return self.name
+    class Meta:
+        verbose_name_plural = 'Import export'
 
 class X_and_C_for_db(models.Model):
     name = models.CharField(max_length=300)
     skp = models.CharField(max_length=50)
-    year = models.IntegerField()
+    year = models.ForeignKey(Year, on_delete=models.CASCADE)
     all_used_resources	= models.FloatField(null=True, blank=True)
     final_demand = models.FloatField(null=True, blank=True)
 
+    class Meta:
+        verbose_name_plural = 'X and C'
+
     def __str__(self):
         return self.name
-    
 
 class Matrix(models.Model):
     A = models.FloatField(null=True, blank=True)
@@ -148,6 +154,10 @@ class Matrix(models.Model):
     BY = models.FloatField(null=True, blank=True)
     BZ = models.FloatField(null=True, blank=True)
 
+    def __str__(self):
+        return self.A
+    class Meta:
+        verbose_name_plural = 'Matrix'
 
 
 

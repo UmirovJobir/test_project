@@ -1,19 +1,26 @@
-from time import process_time
+from wsgiref.util import request_uri
+from rest_framework import permissions
 from .models import Product, Detail, Country, Gdp, Year, Import_export_for_db
 from .serializers import Detail_serializer, Product_serializer, Country_serializer, Product_serializer_details
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from django.core.exceptions import SuspiciousOperation
-from django.http import JsonResponse
-import json
-import pandas as pd
 from new_app.libs.psql import db_clint
-from python_files.logic import first_modul_main
-
-
+import pandas as pd
+from logic import first_modul_main
+from get_data import (
+    get_data__countries_data_for_db,
+    get_data__import_export_for_db,
+    get_data__gdp_for_db,
+    get_data__X_and_C_for_db,
+    get_data__matrix_db
+)
+from rest_framework.pagination import LimitOffsetPagination
 
 # All countries
-class Country_view(APIView):  
+class Country_view(APIView): 
+
     def get(self, request):
         countries = Country.objects.all()
         serializer = Country_serializer(countries, many=True)
@@ -47,13 +54,15 @@ class Data(APIView):
         product_id = request.data['product_id']
         duties = request.data['duty']
         year = request.data['year']
-        percent = request.data['percent']
+        export_percentage = request.data['export_percentage']
+        import_percentage = request.data['import_percentage']
         exchange_rate = request.data['exchange_rate']
 
         countries = []
         products = []
         skp = []
-        percent = percent/100
+        export_percentage = export_percentage/100
+        import_percentage = import_percentage/100
 
         for country in country_id:
             name = Country.objects.filter(id=country).values()
@@ -68,52 +77,56 @@ class Data(APIView):
                     skp.append(i.get('skp'))
                     products.append(i.get('product_name'))
         
-        print(countries, products, skp, duties, year, percent)
+        print(countries, products, skp, duties, year, export_percentage)
 
-        res = first_modul_main(countries,skp,products,duties,year,percent, exchange_rate)
+        res = first_modul_main(countries,skp,products,duties,year,export_percentage, exchange_rate)
         print(res)
         return Response(res)
 
-
+# API to save excel files (requires login password of admin)
 class SaveDataView(APIView):
-    def get(self, request):
-        file = request.data['file']
-        file_name = f'{file}'
-        if file_name=='gdp_for_db.xlsx':
-            df = pd.read_excel(f"excel_files/{file}")
-            df = df.fillna('-')
-            print(df)
-            # for i in df.values:
-            #     print(i[0])
+    permission_classes = [permissions.IsAdminUser]
 
-            #     try:
-            #         year = Year.objects.get(year_number=i[3])
-            #     except Year.DoesNotExist:
-            #         year = Year.objects.create(year_number=i[3])
-
-            #     try:
-            #         Gdp.objects.get(name=i[0],economic_activity=i[1],gdp=i[2],year_number=year)
-            #     except Gdp.DoesNotExist:
-            #         Gdp.objects.create(name=i[0],economic_activity=i[1],gdp=i[2],year_number=year)
-        
-        if file_name=='import_export_for_db.xlsx':
-            df = pd.read_excel(f"excel_files/{file}")
-            df = df.fillna('-')
-            for i in df.values:
-                print(i)
-                # try:
-                #     year = Year.objects.get(year_number=i[3])
-                # except Year.DoesNotExist:
-                #     year = Year.objects.create(year_number=i[3])
-
-                try:
-                    query = Import_export_for_db.objects.get(name=i[0],skp=i[1],year=i[2],_import=i[3],export=i[4])
-                except Import_export_for_db.DoesNotExist:
-                    query = Import_export_for_db.objects.create(name=i[0],skp=i[1],year=i[2],_import=i[3],export=i[4])
+    def post(self, request):
+        file_name = request.data['file_name']
+        file = request.data['file']   
                 
-                print(query)
+        if file_name=='products details file':
+            count = get_data__countries_data_for_db(file)
 
-        return Response(data={"status": "success"})
+        elif file_name=='gdp file':
+            count = get_data__gdp_for_db(file)
+        
+        elif file_name=='import export file':
+            count = get_data__import_export_for_db(file)
+        
+        elif file_name=='x c file':
+            count = get_data__X_and_C_for_db(file)
+        
+        elif file_name=='matrix file':
+            count = get_data__matrix_db(file)
+        
+        else:
+            content = {'ERROR': 'Name of the file unknown.' 
+            'You can send excel file named '
+                'countries_data_for_db.xlsx, '
+                'gdp_for_db.xlsx, '
+                'import_export_for_db.xlsx, '
+                'x_and_c_for_db.xslx, '
+                'matrix.xslx'}
+            return Response(content,status=status.HTTP_404_NOT_FOUND)
+        
+        if type(count) == str:
+            if count == "0, all data is exist":
+                return Response(data={"created data": f"{count}"}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(data={"created data": f"{count}"})
+        elif type(count) == int:
+            if count == 0:
+                return Response(data={"created data": f"{count}, all data is exist"}, status=status.HTTP_404_NOT_FOUND)
+            elif count > 0:
+                return Response(data={"created data": f"{count}"})
+
 
 
 # data for Doston skp_list, country_list, sql_query
