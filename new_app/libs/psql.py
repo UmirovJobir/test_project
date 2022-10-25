@@ -40,12 +40,9 @@ class Database:
             return df
 
     def matrix():
-        query = str(Matrix.objects.all().query)
-        df = pd.read_sql_query(query, connection)
         with connection.cursor() as cursor:
-            cursor.execute("""select a.name,a.economic_activity,a.gdp,b.year
-                                from new_app_gdp a, new_app_year b
-                                where a.year_id=b.id;""")
+            cursor.execute("""SELECT * FROM public.new_app_matrix
+                            ORDER BY id ASC;""")
             row = cursor.fetchall()
             df = pd.DataFrame(row, columns =['id','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 
                                             'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 
