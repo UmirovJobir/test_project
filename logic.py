@@ -125,8 +125,8 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
     imp = creating_import(years,data,skp)
     elasticity = elasticity_calculating(duty,imp,skp)
     starting_point = years[-1]
+    j = 0
     for i in range(starting_point,user_year):
-        j = 0
         years = np.append(years,i+1)
         data = adding_new_duties_to_df(data,products,duties[j],years)
         duty = creating_duties(years,data,skp)
@@ -245,7 +245,7 @@ def used_resources_forecast(used_resources:DataFrame,final_demand:DataFrame,inve
     used_resources = pd.concat([used_resources,new_used_resources])
     return used_resources
 
-def creating_economic_activity(data:DataFrame,economic_activities:ndarray,economic_activities_name:ndarray):
+def creating_economic_activity(data:DataFrame,economic_activities:ndarray,economic_activities_name:ndarray): #association of commodity industries into types of economic activity
     years = year(data)
     cols = data.columns
     columns = ['name','economic_activity','value','year_number']
@@ -258,16 +258,43 @@ def creating_economic_activity(data:DataFrame,economic_activities:ndarray,econom
             k += 1
     return economic_activities_frame
 
+def gdp_forecast(gdp:DataFrame,e_a_used_resources:DataFrame,e_a_export:DataFrame,e_a_import:DataFrame,economic_activities:ndarray,years:ndarray,economic_activities_name:ndarray): #forecasting GDP using linear regression
+    k = 0
+    for i in economic_activities:
+        x = np.empty(0)
+        new_x = np.empty(0)
+        y_frame = gdp[gdp['economic_activity'] == i]
+        y = y_frame['gdp'].values
+        for j in range(years[0],years[-1]):
+            frame_1 = e_a_used_resources[(e_a_used_resources['economic_activity'] == i) & (e_a_used_resources['year_number'] == j)]
+            frame_2 = e_a_export[(e_a_export['economic_activity'] == i) & (e_a_export['year_number'] == j)]
+            frame_3 = e_a_import[(e_a_import['economic_activity'] == i) & (e_a_import['year_number'] == j)]
+            x = np.append(x,[frame_1.iloc[0,2],frame_2.iloc[0,2],-1 * frame_3.iloc[0,2]])
+        x = np.reshape(x,(years[-1]-years[0],3))
+        model = LinearRegression().fit(x,y)
+        frame_1 = e_a_used_resources[(e_a_used_resources['economic_activity'] == i) & (e_a_used_resources['year_number'] == years[-1])]
+        frame_2 = e_a_export[(e_a_export['economic_activity'] == i) & (e_a_export['year_number'] == years[-1])]
+        frame_3 = e_a_import[(e_a_import['economic_activity'] == i) & (e_a_import['year_number'] == years[-1])]
+        new_x = np.append(new_x,[frame_1.iloc[0,2],frame_2.iloc[0,2],-1 * frame_3.iloc[0,2]])
+        new_x = np.reshape(new_x,(1,3))
+        y_pred = model.predict(new_x)
+        y_pred = float(y_pred)
+        gdp.loc[len(gdp.index)] = [economic_activities_name[k],i,y_pred,years[-1]]
+        k += 1
+    return gdp
+
 def second_modul_main(first_module_result:DataFrame,user_year:int,skp:list,alpha:float,alpha_exp:float): #we take the result of the work of the first module and the alpha of exports, the result is a forecast of GDP by type of activity
     technological_matrix = db_clint.matrix()
     inverse_matrix = create_inverse_matrix(technological_matrix)
     all_import_export = db_clint.import_export_for_db()
     all_used_resources_final_demand = db_clint.x_and_c_for_db()
     gdp = db_clint.gdp()
+    gdp = gdp.drop(columns=['id'],axis=1)
     economic_activities = gdp['economic_activity'].unique()
     economic_activities_name = gdp['name'].unique()
     years_imp_exp = all_import_export['year'].unique()
     years_ur_fd = all_used_resources_final_demand['year'].unique()
+    years_gdp = gdp['year'].unique()
 
     used_resources = creating_all_used_resources(all_used_resources_final_demand)
     final_demand = creating_all_final_demand(all_used_resources_final_demand)
@@ -293,10 +320,11 @@ def second_modul_main(first_module_result:DataFrame,user_year:int,skp:list,alpha
     economic_activity_import = creating_economic_activity(all_imp,economic_activities,economic_activities_name)
     economic_activity_export = creating_economic_activity(all_exp,economic_activities,economic_activities_name)
     economic_activity_used_resources = creating_economic_activity(used_resources,economic_activities,economic_activities_name)
-    
-
-    
-    return 0
+    starting_point_2 = years_gdp[-1]
+    for i in range(starting_point_2,user_year):
+        years_gdp = np.append(years_gdp,i+1)
+        gdp = gdp_forecast(gdp,economic_activity_used_resources,economic_activity_export,economic_activity_import,economic_activities,years_gdp,economic_activities_name)
+    return gdp
     
 
 
@@ -305,10 +333,10 @@ if __name__ == '__main__':
     country_id = ['Армения','Беларусь','Казахстан','Кыргызстан','Российская Федерация']
     skp = ['C13','C14','C15','C21','C29','C30']
     duties = [[5,12,25,7,10,15],
-    [5,12,25,7,10,15],
-    [5,12,25,7,10,15],
-    [5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],
-    [5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15],[5,12,25,7,10,15]]
+    [4,11,24,6,9,14],
+    [3,10,23,5,8,13],
+    [2,9,22,4,7,12],[1,8,21,3,6,11],[0,7,20,2,5,10],[0,6,19,1,4,9],[0,5,18,0,3,8],[0,4,17,0,2,7],[0,3,16,0,1,6],[0,2,15,0,0,5],
+    [0,1,14,0,0,4],[0,0,13,0,0,3],[0,0,12,0,0,2],[0,0,11,0,0,1],[0,0,10,0,0,0]]
     products = ['МЕХ ИСКУССТВЕННЫЙ И ИЗДЕЛИЯ ИЗ НЕГО',
     'ПРЕДМЕТЫ ОДЕЖДЫ И ПРИНАДЛЕЖНОСТИ К ОДЕЖДЕ, ИЗ НАТУРАЛЬНОЙ КОЖИ ИЛИ КОМПОЗИЦИОННОЙ КОЖИ:ПРЕДМЕТЫ ОДЕЖДЫ:ИЗ НАТУРАЛЬНОЙ КОЖИ',
     'ДУБЛ.КОЖА ИЛИ КОЖЕВЕН.КРАСТ ИЗ ШКУР К.Р.С.(ВКЛ. БУЙВОЛ),ЖИВОТ.СЕМ-ВА ЛОШАДИНЫХ,...:ВО ВЛАЖНОМ СОСТ.(ВКЛ.ХРОМИРОВАНН.ПОЛУФАБРИКАТ):НЕШЛИФОВ.ЛИЦЕВЫЕ НЕДВОЕНЫЕ;ЛИЦЕВЫЕ ДВОЕНЫЕ:ИЗ ЦЕЛЫХ ШКУР К.Р.С.(ВКЛ.БУЙВОЛ),ПЛОЩАДЬ ПОВЕРХН.КОТ.< 2,6 М2 (28 КВАДРАТ.ФУТОВ)',
