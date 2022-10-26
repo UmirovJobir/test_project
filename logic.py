@@ -288,7 +288,7 @@ def second_modul_main(first_module_result:DataFrame,user_year:int,skp:list,alpha
     inverse_matrix = create_inverse_matrix(technological_matrix)
     all_import_export = db_clint.import_export_for_db()
     all_used_resources_final_demand = db_clint.x_and_c_for_db()
-    print(all_used_resources_final_demand)
+    gdp = db_clint.gdp()
     economic_activities = gdp['economic_activity'].unique()
     economic_activities_name = gdp['name'].unique()
     years_imp_exp = all_import_export['year'].unique()

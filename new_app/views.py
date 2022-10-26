@@ -8,7 +8,7 @@ from rest_framework import status
 from django.core.exceptions import SuspiciousOperation
 from new_app.libs.psql import db_clint
 import pandas as pd
-from logic import first_modul_main
+from logic import first_modul_main, second_modul_main
 from get_data import (
     get_data__countries_data_for_db,
     get_data__import_export_for_db,
@@ -79,9 +79,10 @@ class Data(APIView):
         
         print(countries, products, skp, duties, year, export_percentage)
 
-        res = first_modul_main(countries,skp,products,duties,year,export_percentage, exchange_rate)
-        print(res)
-        return Response(res)
+        first_modul = first_modul_main(countries, skp, products, duties, year, import_percentage, exchange_rate)
+        second_modul = second_modul_main(first_modul, year, skp, import_percentage, export_percentage)
+        print(f"first_modul:{first_modul}\nsecond_modul: {second_modul}")
+        return Response(data={"first_modul":first_modul, "second_modul":second_modul})
 
 # API to save excel files (requires login password of admin)
 class SaveDataView(APIView):
@@ -109,11 +110,11 @@ class SaveDataView(APIView):
         else:
             content = {'ERROR': 'Name of the file unknown.' 
             'You can send excel file named '
-                'countries_data_for_db.xlsx, '
-                'gdp_for_db.xlsx, '
-                'import_export_for_db.xlsx, '
-                'x_and_c_for_db.xslx, '
-                'matrix.xslx'}
+                'products details file, '
+                'gdp file, '
+                'import export file, '
+                'x c file, '
+                'matrix file'}
             return Response(content,status=status.HTTP_404_NOT_FOUND)
         
         if type(count) == str:

@@ -27,9 +27,9 @@ def get_data__countries_data_for_db(file):
             y = Year.objects.create(year=i[3])
 
         try:
-            p = Product.objects.get(code_product=i[0], product_name=i[1], skp=i[2])
+            p = Product.objects.get(code_product=i[0], product_name=i[1].strip(), skp=i[2])
         except Product.DoesNotExist:
-            p = Product.objects.create(code_product=i[0], product_name=i[1], skp=i[2])
+            p = Product.objects.create(code_product=i[0], product_name=i[1].strip(), skp=i[2])
             created_products_len += 1
         try:
             if (i[4]=='-' and i[5]=='-'):
@@ -69,22 +69,22 @@ def get_data__import_export_for_db(file):
 
         try:
             if (i[3]=='-' and i[4]=='-'):
-                query = Import_export_for_db.objects.get(name=i[0],skp=i[1],year=year,_import=None,export=None)
+                query = Import_export_for_db.objects.get(name=i[0].strip(),skp=i[1],year=year,_import=None,export=None)
             elif i[3]=='-':
-                query = Import_export_for_db.objects.get(name=i[0],skp=i[1],year=year,_import=None,export=i[4])
+                query = Import_export_for_db.objects.get(name=i[0].strip(),skp=i[1],year=year,_import=None,export=i[4])
             elif i[4]=='-':
-                query = Import_export_for_db.objects.get(name=i[0],skp=i[1],year=year,_import=i[3],export=None)
+                query = Import_export_for_db.objects.get(name=i[0].strip(),skp=i[1],year=year,_import=i[3],export=None)
             else:
-                query = Import_export_for_db.objects.get(name=i[0],skp=i[1],year=year,_import=i[3],export=i[4])
+                query = Import_export_for_db.objects.get(name=i[0].strip(),skp=i[1],year=year,_import=i[3],export=i[4])
         except Import_export_for_db.DoesNotExist:
             if (i[3]=='-' and i[4]=='-'):
-                query = Import_export_for_db.objects.create(name=i[0],skp=i[1],year=year)
+                query = Import_export_for_db.objects.create(name=i[0].strip(),skp=i[1],year=year)
             elif i[3]=='-':
-                query = Import_export_for_db.objects.create(name=i[0],skp=i[1],year=year,export=i[4])
+                query = Import_export_for_db.objects.create(name=i[0].strip(),skp=i[1],year=year,export=i[4])
             elif i[4]=='-':
-                query = Import_export_for_db.objects.create(name=i[0],skp=i[1],year=year,_import=i[3])
+                query = Import_export_for_db.objects.create(name=i[0].strip(),skp=i[1],year=year,_import=i[3])
             else:
-                query = Import_export_for_db.objects.create(name=i[0],skp=i[1],year=year,_import=i[3],export=i[4])
+                query = Import_export_for_db.objects.create(name=i[0].strip(),skp=i[1],year=year,_import=i[3],export=i[4])
             created_data_len += 1
     return created_data_len
 
@@ -93,6 +93,7 @@ def get_data__gdp_for_db(file):
     df = pd.read_excel(file)
     df = df.fillna('-')
     for i in df.values:
+        print(i[0].strip())
         try:
             year = Year.objects.get(year=i[3])
         except Year.DoesNotExist:
@@ -100,14 +101,14 @@ def get_data__gdp_for_db(file):
 
         try:
             if i[2]=='-':
-                Gdp.objects.get(name=i[0],economic_activity=i[1],gdp=None,year=year)
+                Gdp.objects.get(name=i[0].strip(),economic_activity=i[1],gdp=None,year=year)
             else:
-                Gdp.objects.get(name=i[0],economic_activity=i[1],gdp=i[2],year=year)
+                Gdp.objects.get(name=i[0].strip(),economic_activity=i[1],gdp=i[2],year=year)
         except Gdp.DoesNotExist:
             if i[2]=='-':
-                Gdp.objects.create(name=i[0],economic_activity=i[1],year=year)
+                Gdp.objects.create(name=i[0].strip(),economic_activity=i[1],year=year)
             else:
-                Gdp.objects.create(name=i[0],economic_activity=i[1],gdp=i[2],year=year)
+                Gdp.objects.create(name=i[0].strip(),economic_activity=i[1],gdp=i[2],year=year)
             created_data_len += 1
     return created_data_len
 
@@ -123,22 +124,22 @@ def get_data__X_and_C_for_db(file):
 
         try:
             if (i[3]=='-' and i[4]=='-'):
-                query = X_and_C_for_db.objects.get(name=i[0],skp=i[1],year=year,all_used_resources=None,final_demand=None)
+                query = X_and_C_for_db.objects.get(name=i[0].strip(),skp=i[1],year=year,all_used_resources=None,final_demand=None)
             elif i[3]=='-':
-                query = X_and_C_for_db.objects.get(name=i[0],skp=i[1],year=year,all_used_resources=None,final_demand=i[4])
+                query = X_and_C_for_db.objects.get(name=i[0].strip(),skp=i[1],year=year,all_used_resources=None,final_demand=i[4])
             elif i[4]=='-':
-                query = X_and_C_for_db.objects.get(name=i[0],skp=i[1],year=year,all_used_resources=i[3],final_demand=None)
+                query = X_and_C_for_db.objects.get(name=i[0].strip(),skp=i[1],year=year,all_used_resources=i[3],final_demand=None)
             else:
-                query = X_and_C_for_db.objects.get(name=i[0],skp=i[1],year=year,all_used_resources=i[3],final_demand=i[4])
+                query = X_and_C_for_db.objects.get(name=i[0].strip(),skp=i[1],year=year,all_used_resources=i[3],final_demand=i[4])
         except X_and_C_for_db.DoesNotExist:
             if (i[3]=='-' and i[4]=='-'):
-                query = X_and_C_for_db.objects.create(name=i[0],skp=i[1],year=year)
+                query = X_and_C_for_db.objects.create(name=i[0].strip(),skp=i[1],year=year)
             elif i[3]=='-':
-                query = X_and_C_for_db.objects.create(name=i[0],skp=i[1],year=year,final_demand=i[4])
+                query = X_and_C_for_db.objects.create(name=i[0].strip(),skp=i[1],year=year,final_demand=i[4])
             elif i[4]=='-':
-                query = X_and_C_for_db.objects.create(name=i[0],skp=i[1],year=year,all_used_resources=i[3])
+                query = X_and_C_for_db.objects.create(name=i[0].strip(),skp=i[1],year=year,all_used_resources=i[3])
             else:
-                query = X_and_C_for_db.objects.create(name=i[0],skp=i[1],year=year,all_used_resources=i[3],final_demand=i[4])
+                query = X_and_C_for_db.objects.create(name=i[0].strip(),skp=i[1],year=year,all_used_resources=i[3],final_demand=i[4])
             created_data_len += 1
     return created_data_len
 
@@ -168,4 +169,4 @@ def get_data__matrix_db(file):
 
 
 if __name__ == '__main__':
-    get_data__matrix_db()
+    get_data__gdp_for_db()
