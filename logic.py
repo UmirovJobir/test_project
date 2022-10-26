@@ -254,7 +254,7 @@ def creating_economic_activity(data:DataFrame,economic_activities:ndarray,econom
         k = 0
         for j in economic_activities:
             frame = data[(data['year'] == i) & (data['skp'].str.contains(j))]
-            economic_activities_frame.loc[len(economic_activities_frame.index)] = [economic_activities_name[k],j,frame[cols[3]].sum(),i]
+            economic_activities_frame.loc[len(economic_activities_frame.index)] = [economic_activities_name[k],j,frame[cols[2]].sum(),i]
             k += 1
     return economic_activities_frame
 
