@@ -16,7 +16,7 @@ class Database:
         with connection.cursor() as cursor:
             cursor.execute("""select a.name,a.skp,b.year,a._import,a.export
                                 from new_app_import_export_for_db a, new_app_year b
-                                where a.year_id=b.id;""")
+                                where a.year_id=b.id order by a.year_id;""")
             row = cursor.fetchall()
             df = pd.DataFrame(row, columns =['name','skp','year','_import','export'])
             return df
