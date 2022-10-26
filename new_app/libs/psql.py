@@ -14,9 +14,9 @@ class Database:
 
     def import_export_for_db():
         with connection.cursor() as cursor:
-            cursor.execute("""select a.name,a.skp,b.year,a._import,a.export
+            cursor.execute("""select a.name,a.skp,b.year, a._import, a.export
                                 from new_app_import_export_for_db a, new_app_year b
-                                where a.year_id=b.id order by a.year_id;""")
+                                where a.year_id=b.id order by a.year_id, a.skp;""")
             row = cursor.fetchall()
             df = pd.DataFrame(row, columns =['name','skp','year','_import','export'])
             return df
@@ -25,7 +25,7 @@ class Database:
         with connection.cursor() as cursor:
             cursor.execute("""select a.name,a.skp,b.year,a.all_used_resources,a.final_demand
                                 from new_app_x_and_c_for_db a, new_app_year b
-                                where a.year_id=b.id;""")
+                                where a.year_id=b.id order by a.year_id, a.skp;""")
             row = cursor.fetchall()
             df = pd.DataFrame(row, columns =['name','skp','year','all_used_resources','final_demand'])
             return df
@@ -34,7 +34,7 @@ class Database:
         with connection.cursor() as cursor:
             cursor.execute("""select a.name,a.economic_activity,a.gdp,b.year
                                 from new_app_gdp a, new_app_year b
-                                where a.year_id=b.id;""")
+                                where a.year_id=b.id order by a.year_id, a.economic_activity;""")
             row = cursor.fetchall()
             df = pd.DataFrame(row, columns =['name','economic_activity','gdp','year'])
             return df
