@@ -44,7 +44,9 @@ def creating_import(years:ndarray,data:DataFrame,skp:list): #creating skp groups
     for i in years:
         for j in skp:
             frame = data[(data['year'] == i) & (data['skp'] == j)]
-            imp.loc[len(imp.index)] = [frame['skp'].unique(),frame['price'].sum(),frame['year'].unique()]
+            new_skp = frame['skp'].unique()
+            new_year = frame['year'].unique()
+            imp.loc[len(imp.index)] = [new_skp[0],frame['price'].sum(),new_year[0]]
     return imp
 
 def elasticity_calculating(duty:DataFrame,imp:DataFrame,skp:list): #calculating elasticity for skp groups
@@ -125,6 +127,7 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
     imp = creating_import(years,data,skp)
     elasticity = elasticity_calculating(duty,imp,skp)
     starting_point = years[-1]
+    elasticity_for_API = []
     j = 0
     for i in range(starting_point,user_year):
         years = np.append(years,i+1)
@@ -133,8 +136,9 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
         imp = adding_new_import(years,skp,elasticity,alpha,duty,imp)
         elasticity = elasticity_calculating(duty,imp,skp)
         j += 1
+    elasticity_for_API.append(elasticity)
     imp = dollars_to_million_sums(imp,exchange_rate)
-    return imp
+    return {"imp":imp, "elasticity": elasticity_for_API}
 
 #SECOND MODUL
 
@@ -347,6 +351,6 @@ if __name__ == '__main__':
     alpha_exp = 0.03
     exchange_rate = 11000.0
     res = first_modul_main(country_id,skp,products,duties,user_year,alpha,exchange_rate)
-    print(res)
-    res_2 = second_modul_main(res,user_year,skp,alpha,alpha_exp)
-    print(res_2)
+    print(res['imp'])
+    # res_2 = second_modul_main(res,user_year,skp,alpha,alpha_exp)
+    # print(res_2)

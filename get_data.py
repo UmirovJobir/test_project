@@ -93,7 +93,6 @@ def get_data__gdp_for_db(file):
     df = pd.read_excel(file)
     df = df.fillna('-')
     for i in df.values:
-        print(i[0].strip())
         try:
             year = Year.objects.get(year=i[3])
         except Year.DoesNotExist:

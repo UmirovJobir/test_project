@@ -18,6 +18,9 @@ from get_data import (
 )
 from rest_framework.pagination import LimitOffsetPagination
 
+import warnings
+warnings.filterwarnings('ignore')
+
 # All countries
 class Country_view(APIView): 
 
@@ -61,6 +64,7 @@ class Data(APIView):
         countries = []
         products = []
         skp = []
+
         export_percentage = export_percentage/100
         import_percentage = import_percentage/100
 
@@ -77,12 +81,20 @@ class Data(APIView):
                     skp.append(i.get('skp'))
                     products.append(i.get('product_name'))
         
-        print(countries, products, skp, duties, year, export_percentage)
-
+        # print(countries, products, skp, duties, year, export_percentage)
+        print(skp)
         first_modul = first_modul_main(countries, skp, products, duties, year, import_percentage, exchange_rate)
-        second_modul = second_modul_main(first_modul, year, skp, import_percentage, export_percentage)
-        print(f"first_modul:{first_modul}\nsecond_modul: {second_modul}")
-        return Response(data={"first_modul":first_modul, "second_modul":second_modul})
+        # second_modul = second_modul_main(first_modul['imp'], year, skp, import_percentage, export_percentage)
+        # print(f"first_modul:{first_modul}\nsecond_modul: {second_modul}")
+        # return Response(data={"first_modul":first_modul, "second_modul":second_modul})
+        
+        elasticity_value = []
+        for i in first_modul['elasticity']:
+            print(elasticity_value.append(i[0]))
+        for i, j in skp, elasticity_value:
+            pass 
+
+        return Response(data={"first_modul":first_modul['imp'], "elasticity":{f"{skp}":first_modul['elasticity']}})
 
 # API to save excel files (requires login password of admin)
 class SaveDataView(APIView):
