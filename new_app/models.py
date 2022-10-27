@@ -18,7 +18,7 @@ class Country(models.Model):
 
 
 class Product(models.Model):
-    code_product = models.BigIntegerField()
+    code_product = models.CharField(max_length=50)
     product_name = models.TextField()
     skp = models.CharField(max_length=50)
 
