@@ -16,10 +16,13 @@ from get_data import (
     get_data__X_and_C_for_db,
     get_data__matrix_db
 )
-from rest_framework.pagination import LimitOffsetPagination
-
 import warnings
 warnings.filterwarnings('ignore')
+
+from .dict_make import dictionary_maker
+elasticity_dict = dictionary_maker()
+
+
 
 # All countries
 class Country_view(APIView): 
@@ -51,7 +54,7 @@ class Detail(APIView):
 
 # Logical part of project.
 # API gets request (country_id, product_id, duties, year, percent, exchange_rate, percent) and response a future data of skp
-class Data(APIView):
+class Data(APIView):   
     def get(self, request):
         country_id = request.data['country_id']
         product_id = request.data['product_id']
@@ -81,20 +84,14 @@ class Data(APIView):
                     skp.append(i.get('skp'))
                     products.append(i.get('product_name'))
         
-        # print(countries, products, skp, duties, year, export_percentage)
-        print(skp)
         first_modul = first_modul_main(countries, skp, products, duties, year, import_percentage, exchange_rate)
-        # second_modul = second_modul_main(first_modul['imp'], year, skp, import_percentage, export_percentage)
-        # print(f"first_modul:{first_modul}\nsecond_modul: {second_modul}")
-        # return Response(data={"first_modul":first_modul, "second_modul":second_modul})
-        
-        elasticity_value = []
-        for i in first_modul['elasticity']:
-            print(elasticity_value.append(i[0]))
-        for i, j in skp, elasticity_value:
-            pass 
+        second_modul = second_modul_main(first_modul['imp'], year, skp, import_percentage, export_percentage)
 
-        return Response(data={"first_modul":first_modul['imp'], "elasticity":{f"{skp}":first_modul['elasticity']}})
+        for i, j in zip(skp, first_modul['elasticity']):
+            elasticity_dict.add(i,j)
+
+        return Response(data={"first_modul":{"imp":first_modul['imp'], "elasticity":elasticity_dict},"second_modul":second_modul})
+
 
 # API to save excel files (requires login password of admin)
 class SaveDataView(APIView):
@@ -139,10 +136,3 @@ class SaveDataView(APIView):
                 return Response(data={"created data": f"{count}, all data is exist"}, status=status.HTTP_404_NOT_FOUND)
             elif count > 0:
                 return Response(data={"created data": f"{count}"})
-
-
-
-# data for Doston skp_list, country_list, sql_query
-# db_json = db.to_json(orient='records')
-        # return JsonResponse(json.loads(db_json), safe = False)
-

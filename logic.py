@@ -127,7 +127,6 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
     imp = creating_import(years,data,skp)
     elasticity = elasticity_calculating(duty,imp,skp)
     starting_point = years[-1]
-    elasticity_for_API = []
     j = 0
     for i in range(starting_point,user_year):
         years = np.append(years,i+1)
@@ -136,7 +135,7 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
         imp = adding_new_import(years,skp,elasticity,alpha,duty,imp)
         elasticity = elasticity_calculating(duty,imp,skp)
         j += 1
-    elasticity_for_API.append(elasticity)
+    elasticity_for_API = elasticity.tolist()
     imp = dollars_to_million_sums(imp,exchange_rate)
     return {"imp":imp, "elasticity": elasticity_for_API}
 
