@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$ss__t&w3c9-x_ul_p^!bpvl)@vk#7ge=@ptvzh(t7xk2r&9b#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'new_app',
     'rest_framework',
-    'import_export',
     'drf_yasg',
     'debug_toolbar',
     'nested_admin'
@@ -84,28 +83,28 @@ WSGI_APPLICATION = 'strategy_agency.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 # for docker
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'strategy_agency', 
-#         'USER': 'postgres', 
-#         'PASSWORD': 'postgres',
-#         'HOST': 'pgdb', 
-#         'PORT': '5432',
-#     }
-# }
-
-# local
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'strategy_agency', 
         'USER': 'postgres', 
-        'PASSWORD': '123',
-        'HOST': '127.0.0.1', 
+        'PASSWORD': 'postgres',
+        'HOST': 'pgdb', 
         'PORT': '5432',
     }
 }
+
+# local
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'strategy_agency', 
+#         'USER': 'postgres', 
+#         'PASSWORD': '123',
+#         'HOST': '127.0.0.1', 
+#         'PORT': '5432',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

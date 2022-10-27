@@ -1,6 +1,5 @@
 from email.headerregistry import Group
 from django.contrib import admin
-from import_export.admin import ImportExportActionModelAdmin
 from django.contrib.auth.models import Group
 from django.contrib import admin
 import nested_admin
@@ -16,9 +15,6 @@ from .models import (
 )
 admin.site.unregister(Group)
 
-@admin.register(Import_export_for_db, X_and_C_for_db, Gdp)
-class Admin(ImportExportActionModelAdmin):
-    pass
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
