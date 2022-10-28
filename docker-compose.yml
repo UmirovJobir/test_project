@@ -4,7 +4,6 @@ services:
   django:
     build: .
     container_name: django
-    # command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
     ports:
@@ -21,5 +20,5 @@ services:
     environment:
       - POSTGRES_DB=strategy_agency
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=123
  
