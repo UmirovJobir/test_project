@@ -19,6 +19,9 @@ python3 manage.py migrate
 echo "collectstatic"
 python manage.py collectstatic --no-input
 
+echo "initadmin"
+python manage.py initadmin
+
 echo "Starting server"
 python3 manage.py runserver 0.0.0.0:8000
 
