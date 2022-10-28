@@ -17,13 +17,13 @@ sleep 10
 echo "Apply database migrations"
 python3 manage.py migrate
 
-echo "collectstatic"
-python3 manage.py collectstatic --no-input
+# echo "collectstatic"
+# python3 manage.py collectstatic
 
 echo "initadmin"
 python3 create_admin.py
 
 echo "Starting server"
-python3 manage.py runserver 0.0.0.0:8000
+python3 manage.py runserver --insecure 0.0.0.0:8000
 
 exec "$@"
