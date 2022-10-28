@@ -1,11 +1,10 @@
-
-from django.conf import settings
-from django.core.management.base import BaseCommand
+import os,django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "strategy_agency.settings")
+django.setup()
 from django.contrib.auth.models import User
+from django.conf import settings
 
-class Command(BaseCommand):
-
-    def handle(self, *args, **options):
+def handle(*args, **options):
         if User.objects.count() == 0:
             for user in settings.ADMINS:
                 username = user[0].replace(' ', '')
@@ -18,3 +17,6 @@ class Command(BaseCommand):
                 admin.save()
         else:
             print('Admin accounts can only be initialized if no Accounts exist')
+
+if __name__=='__main__':
+    handle()
