@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$ss__t&w3c9-x_ul_p^!bpvl)@vk#7ge=@ptvzh(t7xk2r&9b#'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -83,15 +83,26 @@ WSGI_APPLICATION = 'strategy_agency.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 # for docker
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'strategy_agency', 
+#         'USER': 'postgres', 
+#         'PASSWORD': 'postgres',
+#         'HOST': 'pgdb', 
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'strategy_agency', 
-        'USER': 'postgres', 
-        'PASSWORD': 'postgres',
-        'HOST': 'pgdb', 
-        'PORT': '5432',
-    }
+   'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB'), 
+        'USER': os.environ.get('POSTGRES_USER'), 
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('POSTGRES_HOST'),    
+        'PORT': os.environ.get('POSTGRES_PORT')
+   }
 }
 
 # local
