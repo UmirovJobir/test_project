@@ -22,15 +22,19 @@ class CountryAdmin(admin.ModelAdmin):
     list_filter = ('country_name',)
     search_fields = ('country_name',)
 
-# @admin.register(Product)
-# class ProductAdmin(admin.ModelAdmin):
-#     list_display = ('code_product','product_name', 'skp')
-#     search_fields = ('product_name',)
+@admin.register(X_and_C_for_db)
+class X_and_C_Admin(admin.ModelAdmin):
+    list_display = ('name', 'skp', 'year', 'all_used_resources', 'final_demand')
 
-# @admin.register(Detail)
-# class DetailAdmin(admin.ModelAdmin):
-#     list_filter = ('product_id',)
-#     search_fields = ('product_id',)
+@admin.register(Gdp)
+class GdpAdmin(admin.ModelAdmin):
+    list_display = ('name', 'economic_activity', 'gdp', 'year')
+
+
+@admin.register(Import_export_for_db)
+class Import_export_Admin(admin.ModelAdmin):
+    list_display = ('name', 'skp', 'year', '_import', 'export')
+
 
 @admin.register(Matrix)
 class MatrixAdmin(admin.ModelAdmin):
