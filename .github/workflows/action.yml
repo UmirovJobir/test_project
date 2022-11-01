@@ -12,15 +12,16 @@ jobs:
     - name: Executing remote command
       uses: appleboy/ssh-action@master
       with:
-        host: 139.144.180.200
-        USERNAME: root
-        PASSWORD: jobir2000JOBIR
-        PORT: 22
-        script: |
-          cd ~
-          cd test_project
-          git pull
-          
-          docker-compose down
-          docker-compose build
-          docker-compose up
+        env:
+          host: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          PORT: 22
+          script: |
+            cd ~
+            cd test_project
+            git pull
+            
+            docker-compose down
+            docker-compose build
+            docker-compose up
