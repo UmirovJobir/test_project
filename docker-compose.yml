@@ -15,7 +15,7 @@ services:
 
 
   pgdb:
-    image: postgres:11
+    image: postgres:13
     container_name: pgdb
     environment:
       - POSTGRES_DB=strategy_agency
@@ -25,10 +25,6 @@ services:
       - POSTGRES_PORT=5432
     volumes:
       - ./data:/var/lib/postgresql/data
-
-volumes:
-    pgdb:
- 
 
 
 
