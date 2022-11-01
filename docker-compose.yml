@@ -10,8 +10,8 @@ services:
       - "8000:8000"
     depends_on:
       - pgdb
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
 
 
   pgdb:
@@ -25,7 +25,6 @@ services:
       - ./data:/var/lib/postgresql/data
 
 volumes:
-    django:
     pgdb:
  
 
