@@ -1,4 +1,4 @@
-name: Second Server Deploy
+name: Deploy
 
 on: [push]
 
@@ -12,7 +12,6 @@ jobs:
     - name: Executing remote command
       uses: appleboy/ssh-action@master
       with:
-        .env:
           host: ${{ secrets.HOST }}
           USERNAME: ${{ secrets.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
